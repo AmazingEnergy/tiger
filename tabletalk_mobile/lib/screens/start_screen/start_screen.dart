@@ -11,9 +11,6 @@ class StartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-
-    mediaQueryData = MediaQuery.of(context);
     return SafeArea(
       child: Scaffold(
         extendBody: true,
@@ -51,22 +48,27 @@ class StartScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 81.v),
-                if (authProvider.credentials == null)
-                  CustomElevatedButton(
-                    width: 111.h,
-                    text: "Login",
-                    buttonStyle: CustomButtonStyles.none,
-                    decoration: CustomButtonStyles
-                        .gradientPrimaryToOnPrimaryContainerDecoration,
-                    onPressed: () {
-                      onTapLogin(context);
-                    },
-                  )
-                else
-                  Profile(
-                    authProvider.credentials?.user,
-                    authProvider.credentials,
-                  ),
+                Consumer<AuthProvider>(
+                  builder: (context, authProvider, child) {
+                    if (authProvider.credentials == null) {
+                      return CustomElevatedButton(
+                        width: 111.h,
+                        text: "Login",
+                        buttonStyle: CustomButtonStyles.none,
+                        decoration: CustomButtonStyles
+                            .gradientPrimaryToOnPrimaryContainerDecoration,
+                        onPressed: () {
+                          onTapLogin(context);
+                        },
+                      );
+                    } else {
+                      return Profile(
+                        authProvider.credentials?.user,
+                        authProvider.credentials,
+                      );
+                    }
+                  },
+                ),
                 SizedBox(height: 70.v),
                 CustomElevatedButton(
                   width: 161.h,
