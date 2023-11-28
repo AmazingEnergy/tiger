@@ -90,11 +90,11 @@ class StartScreen extends StatelessWidget {
   void onTapLogin(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.loginAction();
-    print("accessToken");
-    print(authProvider.credentials?.accessToken);
   }
 
-  void onTapStartSearching(BuildContext context) {
+  void onTapStartSearching(BuildContext context) async {
     //Navigator.pushNamed(context, AppRoutes.searchScreen);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.logoutAction();
   }
 }
