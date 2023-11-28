@@ -26,9 +26,9 @@ class Profile extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text('Welcome, ${user?.name}',
+        Text('Welcome, ${user?.email}',
             style: const TextStyle(
-              color: Color.fromARGB(255, 250, 84, 84),
+              color: Color.fromARGB(255, 206, 109, 109),
               fontSize: 20,
             )),
         const SizedBox(height: 48),

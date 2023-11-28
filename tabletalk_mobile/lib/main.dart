@@ -5,16 +5,18 @@ import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/theme/theme_helper.dart';
 import 'package:tabletalk_mobile/routes/app_routes.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
   ThemeHelper().changeTheme('primary');
+  AuthProvider authProvider = AuthProvider();
+  await authProvider.loadCredentials(); // Load saved credentials
   runApp(
     ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+      create: (_) => authProvider,
       child: const MyApp(),
     ),
   );
@@ -27,21 +29,33 @@ class AuthProvider with ChangeNotifier {
 
   Credentials? get credentials => _credentials;
 
+  Future<void> loadCredentials() async {
+    bool isLoggedIn = await _auth0.credentialsManager.hasValidCredentials();
+    if (isLoggedIn) {
+      _credentials = await _auth0.credentialsManager.credentials();
+      notifyListeners();
+      print(_credentials?.accessToken);
+    }
+  }
+
   Future<void> loginAction() async {
     try {
       final Credentials credentials = await _auth0
           .webAuthentication(scheme: "tabletalk")
           .login(audience: "https://api.amzegy.com/core/");
       _credentials = credentials;
-      notifyListeners();
+      print("accessToken");
       print(_credentials?.accessToken);
+      await _auth0.credentialsManager.storeCredentials(credentials);
+
+      notifyListeners();
     } catch (e, s) {
       debugPrint('[AuthProvider] login error: $e - stack: $s');
     }
   }
 
   Future<void> logoutAction() async {
-    await _auth0.webAuthentication().logout();
+    await _auth0.webAuthentication(scheme: "tabletalk").logout();
     _credentials = null;
     notifyListeners();
   }
