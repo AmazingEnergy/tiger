@@ -13,6 +13,7 @@ class StartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         extendBody: true,
         extendBodyBehindAppBar: true,
         body: Container(
@@ -36,18 +37,9 @@ class StartScreen extends StatelessWidget {
                   height: 176.v,
                   width: 325.h,
                 ),
-                SizedBox(height: 85.v),
-                Container(
-                  margin: EdgeInsets.only(left: 39.h, right: 38.h),
-                  child: Text(
-                    "Welcome to TableTalk\nA food recommendation assistant",
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: CustomTextStyles.labelLargeRed300,
-                  ),
-                ),
-                SizedBox(height: 81.v),
+                SizedBox(height: 80.v),
+                SizedBox(height: 70.v),
+                SizedBox(height: 60.v),
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
                     if (authProvider.credentials == null) {
@@ -62,10 +54,8 @@ class StartScreen extends StatelessWidget {
                         },
                       );
                     } else {
-                      return Profile(
-                        authProvider.credentials?.user,
-                        authProvider.credentials,
-                      );
+                      //onTapStartSearching(context);
+                      return const Text("");
                     }
                   },
                 ),
@@ -105,6 +95,6 @@ class StartScreen extends StatelessWidget {
   }
 
   void onTapStartSearching(BuildContext context) {
-    // Navigator.pushNamed(context, AppRoutes.searchScreen);
+    //Navigator.pushNamed(context, AppRoutes.searchScreen);
   }
 }

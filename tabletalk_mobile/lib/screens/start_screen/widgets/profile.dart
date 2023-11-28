@@ -5,8 +5,7 @@ class Profile extends StatelessWidget {
   final UserProfile? user;
   Credentials? cre;
 
-  Profile(this.user, this.cre, {final Key? key})
-      : super(key: key);
+  Profile(this.user, this.cre, {final Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +13,11 @@ class Profile extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Container(
-          width: 75,
-          height: 75,
+          width: 70,
+          height: 70,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.blue, width: 4),
+            border: Border.all(
+                color: const Color.fromARGB(255, 214, 193, 254), width: 4),
             shape: BoxShape.circle,
             image: DecorationImage(
               fit: BoxFit.fill,
@@ -26,7 +26,11 @@ class Profile extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text('Token: ${user?.name}'),
+        Text('Welcome, ${user?.name}',
+            style: const TextStyle(
+              color: Color.fromARGB(255, 250, 84, 84),
+              fontSize: 20,
+            )),
         const SizedBox(height: 48),
       ],
     );
