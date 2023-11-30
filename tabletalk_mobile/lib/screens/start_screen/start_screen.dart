@@ -2,21 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/main.dart';
-import 'package:tabletalk_mobile/screens/start_screen/widgets/profile.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
-import 'package:tabletalk_mobile/routes/app_routes.dart';
 
 class StartScreen extends StatelessWidget {
-  const StartScreen({Key? key});
+  const StartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        body: Container(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: SafeArea(
+        child: Container(
           width: mediaQueryData.size.width,
           height: mediaQueryData.size.height,
           decoration: BoxDecoration(
@@ -54,7 +52,7 @@ class StartScreen extends StatelessWidget {
                         },
                       );
                     } else {
-                      //onTapStartSearching(context);
+                      onTapStartSearching(context);
                       return const Text("");
                     }
                   },
@@ -78,7 +76,6 @@ class StartScreen extends StatelessWidget {
                     onTapStartSearching(context);
                   },
                 ),
-                SizedBox(height: 5.v),
               ],
             ),
           ),
@@ -93,8 +90,6 @@ class StartScreen extends StatelessWidget {
   }
 
   void onTapStartSearching(BuildContext context) async {
-    //Navigator.pushNamed(context, AppRoutes.searchScreen);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.logoutAction();
+    Navigator.pushNamed(context, AppRoutes.screensContainer);
   }
 }
