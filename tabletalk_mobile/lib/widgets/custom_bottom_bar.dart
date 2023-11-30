@@ -36,7 +36,7 @@ class CustomBottomBarState extends State<CustomBottomBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 56.v,
+      height: 50.v,
       decoration: BoxDecoration(
         color: theme.colorScheme.onPrimary,
         boxShadow: [
@@ -44,7 +44,7 @@ class CustomBottomBarState extends State<CustomBottomBar> {
             color: appTheme.black9003f.withOpacity(0.3),
             spreadRadius: 2.h,
             blurRadius: 2.h,
-            offset: Offset(
+            offset: const Offset(
               0,
               -0.5,
             ),
@@ -116,12 +116,14 @@ class BottomMenuModel {
 }
 
 class DefaultWidget extends StatelessWidget {
+  const DefaultWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.all(10),
-      child: Center(
+      padding: const EdgeInsets.all(10),
+      child: const Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,

@@ -13,7 +13,7 @@ void main() async {
 
   ThemeHelper().changeTheme('primary');
   AuthProvider authProvider = AuthProvider();
-  await authProvider.loadCredentials(); // Load saved credentials
+  await authProvider.loadCredentials();
   runApp(
     ChangeNotifierProvider(
       create: (_) => authProvider,
@@ -62,7 +62,7 @@ class AuthProvider with ChangeNotifier {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
