@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
       theme: theme,
       title: 'TableTalk',
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.startScreen,
+      initialRoute: AppRoutes.recommendationScreen,
       routes: AppRoutes.routes,
     );
   }

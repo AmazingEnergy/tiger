@@ -1,12 +1,9 @@
 class ImageConstant {
-  // Image folder path
   static String imagePath = 'assets/images';
 
-  // Starting page images
   static String imgIconGeneralArrowright =
       '$imagePath/img_icon_general_arrowright.svg';
 
-  // Common images
   static String imgStartingPage = '$imagePath/img_starting_page.png';
 
   static String imgImage3 = '$imagePath/img_image_3.png';
@@ -17,5 +14,9 @@ class ImageConstant {
 
   static String imgUser = '$imagePath/img_user.svg';
 
-  static String imageNotFound = 'assets/images/image_not_found.png';
+  static String imgBell = '$imagePath/img_bell.svg';
+
+  static String imgFilter = '$imagePath/img_filter.svg';
+
+  static String imageNotFound = '$imagePath/image_not_found.png';
 }

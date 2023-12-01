@@ -90,6 +90,6 @@ class StartScreen extends StatelessWidget {
   }
 
   void onTapStartSearching(BuildContext context) async {
-    Navigator.pushNamed(context, AppRoutes.screensContainer);
+    // Navigator.pushNamed(context, AppRoutes.screensContainer);
   }
 }
