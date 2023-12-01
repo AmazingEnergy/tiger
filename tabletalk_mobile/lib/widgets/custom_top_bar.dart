@@ -27,20 +27,20 @@ class CustomTopBarState extends State<CustomTopBar> {
     ),
   ];
 
-  // Info boxes for Recipes tab
+  // Info boxes for Recipes
   List<InfoBox> recipesInfoBoxes = [
     InfoBox(title: 'Recipe Info 1', description: 'Recipe Description 1'),
     InfoBox(title: 'Recipe Info 2', description: 'Recipe Description 2'),
-    // ... Add more recipe info boxes as needed
+    // ... Add more later
   ];
 
-  // Info boxes for Restaurant tab
+  // Info boxes for Restaurant
   List<InfoBox> restaurantInfoBoxes = [
     InfoBox(
         title: 'Restaurant Info 1', description: 'Restaurant Description 1'),
     InfoBox(
         title: 'Restaurant Info 2', description: 'Restaurant Description 2'),
-    // ... Add more restaurant info boxes as needed
+    // ... Add more later
   ];
 
   @override
@@ -56,22 +56,26 @@ class CustomTopBarState extends State<CustomTopBar> {
                 widget.onChanged?.call(topMenuList[index].type);
                 setState(() {});
               },
-              child: Text(
-                topMenuList[index].text,
-                style: TextStyle(
-                  color: selectedIndex == index
-                      ? theme.colorScheme.primary
-                      : appTheme.gray500,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  decoration: selectedIndex == index
-                      ? TextDecoration.underline
-                      : TextDecoration.none,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                child: Text(
+                  topMenuList[index].text,
+                  style: TextStyle(
+                    color: selectedIndex == index
+                        ? const Color.fromRGBO(233, 30, 99, 1)
+                        : appTheme.gray500,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    decoration: selectedIndex == index
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
+                  ),
                 ),
               ),
             );
           }),
         ),
+        SizedBox(height: 16.0),
         if (topMenuList[selectedIndex].type == TopBarEnum.Recipes)
           InfoBoxGrid(recipesInfoBoxes),
         if (topMenuList[selectedIndex].type == TopBarEnum.Restaurant)

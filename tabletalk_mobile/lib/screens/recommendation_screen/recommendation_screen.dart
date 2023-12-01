@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
-import 'package:tabletalk_mobile/widgets/custom_top_bar.dart'; // Import CustomTopBar
+import 'package:tabletalk_mobile/widgets/custom_top_bar.dart';
 
 // ignore: must_be_immutable
 class RecommendationScreen extends StatelessWidget {
@@ -30,20 +30,25 @@ class RecommendationScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Search Results',
-                          style: TextStyle(
-                            color: Color.fromRGBO(253, 99, 124, 1),
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '50 results',
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 194, 194, 194),
-                            fontSize: 11,
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              color: Color.fromRGBO(253, 99, 124, 1),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            children: [
+                              const TextSpan(
+                                text: 'Search Results... ',
+                              ),
+                              TextSpan(
+                                text: '50 results',
+                                style: const TextStyle(
+                                  color: Color.fromARGB(255, 194, 194, 194),
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: 8),
@@ -63,24 +68,24 @@ class RecommendationScreen extends StatelessWidget {
                   Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 9.0, left: 10),
+                        padding: const EdgeInsets.only(top: 0.0, left: 9),
                         child: InkWell(
                           onTap: () {
                             //  bell icon click logic here
                           },
                           child: SvgPicture.asset(
                             ImageConstant.imgBell,
-                            width: 50,
-                            height: 50,
+                            width: 42,
+                            height: 42,
                           ),
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 0),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 0.0, left: 10),
+                        padding: const EdgeInsets.only(bottom: 5.0, left: 10),
                         child: InkWell(
                           onTap: () {
-                            // icon click logic here
+                            // filter icon click logic here
                           },
                           child: SvgPicture.asset(
                             ImageConstant.imgFilter,
