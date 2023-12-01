@@ -31,6 +31,8 @@ class CustomTopBarState extends State<CustomTopBar> {
   List<InfoBox> recipesInfoBoxes = [
     InfoBox(title: 'Recipe Info 1', description: 'Recipe Description 1'),
     InfoBox(title: 'Recipe Info 2', description: 'Recipe Description 2'),
+    InfoBox(title: 'Recipe Info 3', description: 'Recipe Description 3'),
+    InfoBox(title: 'Recipe Info 4', description: 'Recipe Description 4'),
     // ... Add more later
   ];
 
@@ -99,30 +101,4 @@ class TopMenuModel {
   String text;
 
   TopBarEnum type;
-}
-
-class DefaultWidget extends StatelessWidget {
-  const DefaultWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.all(10),
-      child: const Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Please replace the respective Widget here',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
