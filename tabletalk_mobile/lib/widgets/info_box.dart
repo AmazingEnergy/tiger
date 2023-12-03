@@ -64,7 +64,7 @@ class InfoBoxWidget extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Rating 
+              // Rating
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -127,7 +127,7 @@ class InfoBoxWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () {
-                  //icon click logic here
+                  // Icon click logic here
                 },
                 child: SvgPicture.asset(
                   ImageConstant.imgIicon,
