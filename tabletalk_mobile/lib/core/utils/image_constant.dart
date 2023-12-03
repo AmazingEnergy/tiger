@@ -18,5 +18,7 @@ class ImageConstant {
 
   static String imgFilter = '$imagePath/img_filter.svg';
 
+  static String imgIicon = '$imagePath/img_i_icon.svg';
+
   static String imageNotFound = '$imagePath/image_not_found.png';
 }

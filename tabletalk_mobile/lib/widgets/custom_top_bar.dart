@@ -80,7 +80,7 @@ class CustomTopBarState extends State<CustomTopBar> {
             ),
           ),
           SizedBox(height: 16.0),
-          InfoBoxGrid(currentInfoBoxes), // Use the current InfoBoxes
+          InfoBoxGrid(currentInfoBoxes),
         ],
       ),
     );

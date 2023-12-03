@@ -12,44 +12,35 @@ class RecommendationScreen extends StatelessWidget {
 
   TextEditingController askController = TextEditingController();
 
-  // Customize the text and info boxes as needed
   final String recipeText = "Recipe";
   final String restaurantText = "Restaurant";
 
   final List<InfoBox> customRecipeInfoBoxes = [
     InfoBox(
-        title: 'Custom Recipe Info 1',
-        description: 'Custom Recipe Description 1'),
+        title: 'Recipe 1', leftText: 'Left Text 1', rightText: 'Right Text 1'),
     InfoBox(
-        title: 'Custom Recipe Info 2',
-        description: 'Custom Recipe Description 2'),
+        title: 'Recipe 2', leftText: 'Left Text 2', rightText: 'Right Text 2'),
     InfoBox(
-        title: 'Custom Recipe Info 2',
-        description: 'Custom Recipe Description 2'),
+        title: 'Recipe 3', leftText: 'Left Text 2', rightText: 'Right Text 2'),
     InfoBox(
-        title: 'Custom Recipe Info 2',
-        description: 'Custom Recipe Description 2'),
+        title: 'Recipe 4', leftText: 'Left Text 2', rightText: 'Right Text 2'),
     InfoBox(
-        title: 'Custom Recipe Info 2',
-        description: 'Custom Recipe Description 2'),
+        title: 'Recipe 5', leftText: 'Left Text 2', rightText: 'Right Text 2'),
     InfoBox(
-        title: 'Custom Recipe Info 2',
-        description: 'Custom Recipe Description 2'),
-    InfoBox(
-        title: 'Custom Recipe Info 2',
-        description: 'Custom Recipe Description 2'),
-
-    // ... Add more later
+        title: 'Recipe 6', leftText: 'Left Text 2', rightText: 'Right Text 2'),
+    // ... (add more if needed)
   ];
 
   final List<InfoBox> customRestaurantInfoBoxes = [
     InfoBox(
-        title: 'Custom Restaurant Info 1',
-        description: 'Custom Restaurant Description 1'),
+        title: 'Restaurant 1',
+        leftText: 'Left Text 1',
+        rightText: 'Right Text 1'),
     InfoBox(
-        title: 'Custom Restaurant Info 2',
-        description: 'Custom Restaurant Description 2'),
-    // ... Add more later
+        title: 'Restaurant 2',
+        leftText: 'Left Text 2',
+        rightText: 'Right Text 2'),
+    // ... (add more if needed)
   ];
 
   @override
@@ -60,7 +51,6 @@ class RecommendationScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          // Wrap your content with SingleChildScrollView
           child: Container(
             width: double.infinity,
             padding: EdgeInsets.all(16),
@@ -114,7 +104,7 @@ class RecommendationScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 0.0, left: 9),
                           child: InkWell(
                             onTap: () {
-                              //  bell icon click logic here
+                              // bell icon  logic
                             },
                             child: SvgPicture.asset(
                               ImageConstant.imgBell,
@@ -128,7 +118,7 @@ class RecommendationScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(bottom: 5.0, left: 10),
                           child: InkWell(
                             onTap: () {
-                              // filter icon click logic here
+                              // filter icon ogic
                             },
                             child: SvgPicture.asset(
                               ImageConstant.imgFilter,
@@ -141,13 +131,9 @@ class RecommendationScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 SizedBox(height: 16),
-                // Second Row
                 CustomTopBar(
-                  onChanged: (type) {
-                    // Handle changes in RecommendationScreen
-                  },
+                  onChanged: (type) {},
                   menuItems: [
                     TopMenuModel(text: recipeText, type: TopBarEnum.Item1),
                     TopMenuModel(text: restaurantText, type: TopBarEnum.Item2),
