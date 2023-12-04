@@ -40,43 +40,26 @@ class CustomTopBarState extends State<CustomTopBar> {
         children: [
           Container(
             height: 50,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.menuItems.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    selectedIndex = index;
-                    widget.onChanged(widget.menuItems[index].type);
-                    setState(() {
-                      // Switch InfoBoxes based on the selected menu item
-                      currentInfoBoxes =
-                          (widget.menuItems[index].type == TopBarEnum.Item1)
-                              ? widget.recipeInfoBoxes
-                              : widget.restaurantInfoBoxes;
-                    });
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 60.0),
-                    child: Text(
-                      widget.menuItems[index].text,
-                      style: TextStyle(
-                        color: selectedIndex == index
-                            ? const Color.fromRGBO(233, 30, 99, 1)
-                            : Colors.grey,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        decoration: selectedIndex == index
-                            ? TextDecoration.underline
-                            : TextDecoration.none,
-                        decorationColor: selectedIndex == index
-                            ? const Color.fromRGBO(233, 30, 99, 1)
-                            : Colors.transparent,
-                      ),
-                    ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      _onMenuItemSelected(TopBarEnum.Item1);
+                    },
+                    child: buildMenuItem("Recipes", TopBarEnum.Item1),
                   ),
-                );
-              },
+                ),
+                buildVerticalLine(),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      _onMenuItemSelected(TopBarEnum.Item2);
+                    },
+                    child: buildMenuItem("Restaurants", TopBarEnum.Item2),
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: 16.0),
@@ -84,6 +67,58 @@ class CustomTopBarState extends State<CustomTopBar> {
         ],
       ),
     );
+  }
+
+  Widget buildMenuItem(String text, TopBarEnum type) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              color: selectedIndex == menuIndex(type)
+                  ? const Color.fromRGBO(233, 30, 99, 1)
+                  : Colors.grey,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8.0),
+          Container(
+            height: 2,
+            width: 120,
+            color: selectedIndex == menuIndex(type)
+                ? const Color.fromRGBO(255, 142, 161, 1)
+                : Colors.transparent,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildVerticalLine() {
+    return Container(
+      height: 30,
+      width: 2,
+      color: Colors.grey,
+    );
+  }
+
+  int menuIndex(TopBarEnum type) {
+    return widget.menuItems.indexWhere((item) => item.type == type);
+  }
+
+  void _onMenuItemSelected(TopBarEnum type) {
+    setState(() {
+      selectedIndex = menuIndex(type);
+      widget.onChanged(type);
+      currentInfoBoxes = (type == TopBarEnum.Item1)
+          ? widget.recipeInfoBoxes
+          : widget.restaurantInfoBoxes;
+    });
   }
 }
 

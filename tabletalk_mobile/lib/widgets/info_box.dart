@@ -59,83 +59,94 @@ class InfoBoxWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
+          // Icon
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: InkWell(
+                  onTap: () {
+                    // Icon click logic here
+                  },
+                  child: SvgPicture.asset(
+                    ImageConstant.imgIicon,
+                    width: 30,
+                    height: 30,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Spacer(),
+          // Title and Rating or Left Text and Right Text
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Rating
-              Row(
+              // Title or Left Text
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  child: Text(
+                    infoBox.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1, // Set maxLines to 1
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              // Rating or Right Text
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: [
+                      Icon(Icons.star, color: Colors.yellow, size: 16),
+                      SizedBox(width: 4),
                       Text(
-                        infoBox.title,
+                        '4.5',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.grey,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.yellow, size: 16),
-                          SizedBox(width: 4),
-                          Text(
-                            '4.5',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
                 ],
               ),
-              Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    infoBox.leftText,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  Text(
-                    infoBox.rightText,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
-          Positioned(
-            top: -8,
-            right: -8,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: () {
-                  // Icon click logic here
-                },
-                child: SvgPicture.asset(
-                  ImageConstant.imgIicon,
-                  width: 30,
-                  height: 30,
+          SizedBox(height: 4),
+          // Left and Right Text
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                infoBox.leftText,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
                 ),
+                maxLines: 1, // Set maxLines to 1
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
+              Text(
+                infoBox.rightText,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+                maxLines: 1, // Set maxLines to 1
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ],
       ),
