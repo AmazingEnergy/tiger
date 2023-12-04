@@ -67,18 +67,24 @@ class RecommendationScreen extends StatelessWidget {
                             text: TextSpan(
                               style: const TextStyle(
                                 color: Color.fromRGBO(253, 99, 124, 1),
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                               children: [
                                 const TextSpan(
-                                  text: 'Search Results... ',
+                                  text: 'Our recommendations...',
                                 ),
-                                TextSpan(
-                                  text: '50 results',
-                                  style: const TextStyle(
-                                    color: Color.fromARGB(255, 194, 194, 194),
-                                    fontSize: 11,
+                                WidgetSpan(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 45.0),
+                                    child: Text(
+                                      '50 results',
+                                      style: const TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 194, 194, 194),
+                                        fontSize: 11,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
