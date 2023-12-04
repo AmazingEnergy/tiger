@@ -8,7 +8,7 @@ import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
 import 'package:tabletalk_mobile/widgets/info_box.dart';
 
 class RecommendationScreen extends StatelessWidget {
-  RecommendationScreen({Key? key}) : super(key: key);
+  RecommendationScreen({super.key});
 
   TextEditingController askController = TextEditingController();
 
