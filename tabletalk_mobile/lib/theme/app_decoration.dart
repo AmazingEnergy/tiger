@@ -9,12 +9,24 @@ class AppDecoration {
   static BoxDecoration get fillOnPrimaryContainer => BoxDecoration(
         color: theme.colorScheme.onPrimaryContainer.withOpacity(1),
       );
+  static BoxDecoration get fillBlueGray => BoxDecoration(
+        color: appTheme.blueGray100,
+      );
+  static BoxDecoration get fillGray => BoxDecoration(
+        color: appTheme.gray200,
+      );
+  static BoxDecoration get fillWhiteA => BoxDecoration(
+        color: appTheme.whiteA700,
+      );
 }
 
 class BorderRadiusStyle {
   // Circle borders
   static BorderRadius get circleBorder21 => BorderRadius.circular(
         21.h,
+      );
+  static BorderRadius get roundedBorder12 => BorderRadius.circular(
+        12.h,
       );
 }
 

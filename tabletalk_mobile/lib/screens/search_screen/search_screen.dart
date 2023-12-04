@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
-import 'package:tabletalk_mobile/routes/app_routes.dart';
 
 // ignore: must_be_immutable
 class SearchScreen extends StatelessWidget {

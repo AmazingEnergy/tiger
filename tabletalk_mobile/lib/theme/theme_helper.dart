@@ -110,11 +110,28 @@ class PrimaryColors {
   // BlueGray
   Color get blueGray100 => const Color(0XFFCECECE);
 
-  // Gray
-  Color get gray500 => const Color(0XFF8F8F8F);
-
   // Red
   Color get red300 => const Color(0XFFE87676);
+
+  // Black
+  Color get black900 => const Color(0XFF000000);
+
+  // Gray
+  Color get gray200 => const Color(0XFFEAEAEA);
+  Color get gray500 => const Color(0XFFA9A9A9);
+  Color get gray900 => const Color(0XFF121212);
+
+  // Orange
+  Color get orange100 => const Color(0XFFFFE1B3);
+  Color get orange400 => const Color(0XFFFFAC2F);
+
+  // Pink
+  Color get pink300 => const Color(0XFFFD637C);
+  Color get pink30001 => const Color(0XFFFC637C);
+  Color get pinkA100 => const Color(0XFFFF8EA0);
+
+  // White
+  Color get whiteA700 => const Color(0XFFFFFFFF);
 }
 
 PrimaryColors get appTheme => ThemeHelper().themeColor();
