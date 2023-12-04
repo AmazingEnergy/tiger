@@ -49,7 +49,7 @@ class RecipeIngredientsScreenState extends State<RecipeIngredientsScreen>
                           children: [
                             for (String ingredient in widget.ingredients)
                               Padding(
-                                padding: EdgeInsets.only(bottom: 8.0),
+                                padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Text(
                                   "$ingredient.",
                                   maxLines: 1000,

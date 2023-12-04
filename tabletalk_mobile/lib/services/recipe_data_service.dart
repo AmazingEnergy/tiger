@@ -9,22 +9,8 @@ class RecipeDataService {
     if (response.statusCode == 200) {
       List<dynamic> jsonData = json.decode(response.body);
 
-      List<RecipeDetail> recipeDetails = jsonData.map((data) {
-        return RecipeDetail(
-          id: data['id'],
-          name: data['name'],
-          time: data['time'],
-          author: data['author'],
-          imageUrl: data['imageUrl'],
-          ingredients: List<String>.from(data['ingredients']),
-          instructions: List<Instruction>.from(
-            data['instructions'].map((instruction) => Instruction(
-                  step: instruction['step'],
-                  description: instruction['description'],
-                )),
-          ),
-        );
-      }).toList();
+      List<RecipeDetail> recipeDetails =
+          jsonData.map((data) => RecipeDetail.fromJson(data)).toList();
 
       return recipeDetails;
     } else {

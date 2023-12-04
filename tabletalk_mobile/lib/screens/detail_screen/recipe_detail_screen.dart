@@ -52,11 +52,11 @@ class RecipeDetailScreenState extends State<RecipeDetailScreen>
                   SizedBox(height: 5.v),
                   Padding(
                       padding: EdgeInsets.only(left: 30.h),
-                      child: Text("${widget.recipeDetail.author}",
+                      child: Text(widget.recipeDetail.author,
                           style: CustomTextStyles.bodyMediumBlack900)), //author
                   SizedBox(height: 10.v),
                   Center(
-                    child: Container(
+                    child: SizedBox(
                         height: 33.v,
                         width: 270.h,
                         child: TabBar(
@@ -112,7 +112,7 @@ class RecipeDetailScreenState extends State<RecipeDetailScreen>
             width: 315.h,
             child: Stack(alignment: Alignment.center, children: [
               CustomImageView(
-                  imagePath: ImageConstant.imgImage, //imgpath
+                  imagePath: widget.recipeDetail.imageUrl, //imgpath
                   height: 200.v,
                   width: 300.h,
                   alignment: Alignment.center),

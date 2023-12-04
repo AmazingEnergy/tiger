@@ -1,21 +1,23 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/recipe_result_info_box.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/restaurant_result_info_box.dart';
 import 'info_box.dart';
 
 class CustomTopBar extends StatefulWidget {
-  CustomTopBar({
-    Key? key,
+  const CustomTopBar({
+    super.key,
     required this.onChanged,
     required this.menuItems,
     required this.recipeInfoBoxes,
     required this.restaurantInfoBoxes,
-  }) : super(key: key);
+  });
 
   final Function(dynamic) onChanged;
   final List<TopMenuModel> menuItems;
-  final List<InfoBox> recipeInfoBoxes;
-  final List<InfoBox> restaurantInfoBoxes;
+  final List<RecipeResultInfoBox> recipeInfoBoxes;
+  final List<RestaurantResultInfoBox> restaurantInfoBoxes;
 
   @override
   CustomTopBarState createState() => CustomTopBarState();
@@ -29,7 +31,7 @@ class CustomTopBarState extends State<CustomTopBar> {
   void initState() {
     super.initState();
     // Set the initial InfoBoxes
-    currentInfoBoxes = widget.recipeInfoBoxes;
+    currentInfoBoxes = widget.recipeInfoBoxes.cast<InfoBox>();
   }
 
   @override
@@ -115,9 +117,10 @@ class CustomTopBarState extends State<CustomTopBar> {
     setState(() {
       selectedIndex = menuIndex(type);
       widget.onChanged(type);
-      currentInfoBoxes = (type == TopBarEnum.Item1)
-          ? widget.recipeInfoBoxes
-          : widget.restaurantInfoBoxes;
+      currentInfoBoxes = ((type == TopBarEnum.Item1)
+              ? widget.recipeInfoBoxes
+              : widget.restaurantInfoBoxes)
+          .cast<InfoBox>();
     });
   }
 }

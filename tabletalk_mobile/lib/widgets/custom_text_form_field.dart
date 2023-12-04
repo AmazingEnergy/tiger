@@ -25,51 +25,33 @@ class CustomTextFormField extends StatelessWidget {
     this.fillColor,
     this.filled = true,
     this.validator,
+    this.enabled = true, // Added enabled field with default value true
   }) : super(
           key: key,
         );
 
   final Alignment? alignment;
-
   final double? width;
-
   final TextEditingController? controller;
-
   final FocusNode? focusNode;
-
   final bool? autofocus;
-
   final TextStyle? textStyle;
-
   final bool? obscureText;
-
   final TextInputAction? textInputAction;
-
   final TextInputType? textInputType;
-
   final int? maxLines;
-
   final String? hintText;
-
   final TextStyle? hintStyle;
-
   final Widget? prefix;
-
   final BoxConstraints? prefixConstraints;
-
   final Widget? suffix;
-
   final BoxConstraints? suffixConstraints;
-
   final EdgeInsets? contentPadding;
-
   final InputBorder? borderDecoration;
-
   final Color? fillColor;
-
   final bool? filled;
-
   final FormFieldValidator<String>? validator;
+  final bool enabled; // New field to control the enabled state
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +76,7 @@ class CustomTextFormField extends StatelessWidget {
           maxLines: maxLines ?? 1,
           decoration: decoration,
           validator: validator,
+          enabled: enabled, // Set the enabled state
         ),
       );
   InputDecoration get decoration => InputDecoration(

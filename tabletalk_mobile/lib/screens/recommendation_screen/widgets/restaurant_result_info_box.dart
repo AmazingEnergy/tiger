@@ -1,52 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabletalk_mobile/core/app_export.dart';
 
-class InfoBox {
-  final String title;
-  final String leftText;
-  final String rightText;
+class RestaurantResultInfoBox extends StatelessWidget {
+  final String id;
+  final String name;
+  final double rating;
+  final String reason;
+  final String imageUrl;
 
-  InfoBox({
-    required this.title,
-    required this.leftText,
-    required this.rightText,
+  const RestaurantResultInfoBox({
+    required this.id,
+    required this.name,
+    required this.rating,
+    required this.reason,
+    required this.imageUrl,
+    super.key,
   });
-}
-
-class InfoBoxGrid extends StatelessWidget {
-  final List<InfoBox> infoBoxes;
-
-  InfoBoxGrid(this.infoBoxes);
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-      ),
-      itemCount: infoBoxes.length,
-      itemBuilder: (context, index) {
-        return InfoBoxWidget(infoBoxes[index]);
-      },
-    );
-  }
-}
-
-class InfoBoxWidget extends StatelessWidget {
-  final InfoBox infoBox;
-
-  InfoBoxWidget(this.infoBox);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.0),
-      margin: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(8.0),
@@ -55,7 +31,7 @@ class InfoBoxWidget extends StatelessWidget {
             color: const Color.fromARGB(255, 51, 51, 51).withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 3,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -81,29 +57,29 @@ class InfoBoxWidget extends StatelessWidget {
               ),
             ],
           ),
-          Spacer(),
+          const Spacer(),
           // Title and Rating or Left Text and Right Text
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title or Left Text
               Expanded(
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   child: Text(
-                    infoBox.title,
-                    style: TextStyle(
+                    name,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
-                    maxLines: 1, // Set maxLines to 1
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               // Rating or Right Text
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -123,27 +99,34 @@ class InfoBoxWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           // Left and Right Text
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                infoBox.leftText,
-                style: TextStyle(
+                'Rating: $rating',
+                style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
                 ),
-                maxLines: 1, // Set maxLines to 1
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // Additional Information
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Text(
-                infoBox.rightText,
-                style: TextStyle(
+                reason,
+                style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
                 ),
-                maxLines: 1, // Set maxLines to 1
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],

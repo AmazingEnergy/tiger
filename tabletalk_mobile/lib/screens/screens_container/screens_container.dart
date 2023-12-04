@@ -20,17 +20,6 @@ class ScreensContainer extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          Container(
-            width: mediaQueryData.size.width,
-            height: mediaQueryData.size.height,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.onPrimary,
-              image: DecorationImage(
-                image: AssetImage(ImageConstant.imgStartingPage),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           Navigator(
             key: navigatorKey,
             initialRoute: AppRoutes.searchScreen,

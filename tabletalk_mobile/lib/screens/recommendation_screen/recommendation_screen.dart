@@ -1,50 +1,55 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tabletalk_mobile/widgets/custom_top_bar.dart';
+import 'package:tabletalk_mobile/core/app_export.dart';
+import 'package:tabletalk_mobile/models/recipe_search_result.dart';
+import 'package:tabletalk_mobile/models/restaurant_search_result.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/custom_top_bar.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/recipe_result_info_box.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/restaurant_result_info_box.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
-import 'package:tabletalk_mobile/widgets/info_box.dart';
 
 class RecommendationScreen extends StatelessWidget {
-  RecommendationScreen({super.key});
+  RecommendationScreen({
+    super.key,
+    required this.recipeResult,
+    required this.restaurantResult,
+  });
 
-  TextEditingController askController = TextEditingController();
+  final TextEditingController askController = TextEditingController();
 
   final String recipeText = "Recipe";
   final String restaurantText = "Restaurant";
 
-  final List<InfoBox> customRecipeInfoBoxes = [
-    InfoBox(
-        title: 'Recipe 1', leftText: 'Left Text 1', rightText: 'Right Text 1'),
-    InfoBox(
-        title: 'Recipe 2', leftText: 'Left Text 2', rightText: 'Right Text 2'),
-    InfoBox(
-        title: 'Recipe 3', leftText: 'Left Text 2', rightText: 'Right Text 2'),
-    InfoBox(
-        title: 'Recipe 4', leftText: 'Left Text 2', rightText: 'Right Text 2'),
-    InfoBox(
-        title: 'Recipe 5', leftText: 'Left Text 2', rightText: 'Right Text 2'),
-    InfoBox(
-        title: 'Recipe 6', leftText: 'Left Text 2', rightText: 'Right Text 2'),
-    // ... (add more if needed)
-  ];
+  final List<RecipeResultInfoBox> customRecipeInfoBoxes = [];
+  final List<RestaurantResultInfoBox> customRestaurantInfoBoxes = [];
 
-  final List<InfoBox> customRestaurantInfoBoxes = [
-    InfoBox(
-        title: 'Restaurant 1',
-        leftText: 'Left Text 1',
-        rightText: 'Right Text 1'),
-    InfoBox(
-        title: 'Restaurant 2',
-        leftText: 'Left Text 2',
-        rightText: 'Right Text 2'),
-    // ... (add more if needed)
-  ];
+  final List<RecipeSearchResult> recipeResult;
+  final List<RestaurantSearchResult> restaurantResult;
 
   @override
   Widget build(BuildContext context) {
+    for (var result in recipeResult) {
+      customRecipeInfoBoxes.add(RecipeResultInfoBox(
+          id: result.id,
+          name: result.name,
+          author: "author",
+          time: result.time,
+          reason: result.reason,
+          imageUrl: result.imageUrl));
+    }
+
+    for (var result in restaurantResult) {
+      customRestaurantInfoBoxes.add(RestaurantResultInfoBox(
+        id: result.id,
+        name: result.name,
+        rating: result.rating,
+        reason: result.reason,
+        imageUrl: result.imageUrl,
+      ));
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBody: true,
@@ -53,7 +58,7 @@ class RecommendationScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -64,35 +69,23 @@ class RecommendationScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
+                            text: const TextSpan(
+                              style: TextStyle(
                                 color: Color.fromRGBO(253, 99, 124, 1),
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                               children: [
-                                const TextSpan(
+                                TextSpan(
                                   text: 'Our recommendations...',
-                                ),
-                                WidgetSpan(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 45.0),
-                                    child: Text(
-                                      '50 results',
-                                      style: const TextStyle(
-                                        color:
-                                            Color.fromARGB(255, 194, 194, 194),
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 20),
                           CustomTextFormField(
                             controller: askController,
+                            enabled: false,
                             hintText: "Ask us anything!",
                             textInputAction: TextInputAction.done,
                             textStyle: TextStyle(
@@ -119,7 +112,6 @@ class RecommendationScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 0),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 5.0, left: 10),
                           child: InkWell(
@@ -137,7 +129,7 @@ class RecommendationScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 CustomTopBar(
                   onChanged: (type) {},
                   menuItems: [

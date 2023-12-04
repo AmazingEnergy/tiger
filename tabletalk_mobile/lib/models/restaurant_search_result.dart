@@ -1,33 +1,27 @@
-class RestaurantDetail {
+class RestaurantSearchResult {
   final String id;
   final String name;
   final double rating;
-  final String address;
   final String imageUrl;
-  final String mapUrl;
-  final String website;
+  final String reason;
 
-  const RestaurantDetail({
+  RestaurantSearchResult({
     required this.id,
     required this.name,
     required this.rating,
-    required this.address,
     required this.imageUrl,
-    required this.mapUrl,
-    required this.website,
+    required this.reason,
   });
 
-  factory RestaurantDetail.fromJson(Map<String, dynamic> json) {
-    return RestaurantDetail(
+  factory RestaurantSearchResult.fromJson(Map<String, dynamic> json) {
+    return RestaurantSearchResult(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       rating: json['rating'] != null
           ? double.parse(json['rating'].toString())
           : 0.0,
-      address: json['address'] ?? '',
       imageUrl: json['imageUrl'] ?? '',
-      mapUrl: json['mapUrl'] ?? '',
-      website: json['website'] ?? '',
+      reason: json['reason'] ?? '',
     );
   }
 }

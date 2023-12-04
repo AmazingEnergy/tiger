@@ -10,14 +10,7 @@ class RestaurantDataService {
       List<dynamic> jsonData = json.decode(response.body);
 
       List<RestaurantDetail> restaurantDetails = jsonData.map((data) {
-        return RestaurantDetail(
-            id: data['id'],
-            name: data['name'],
-            rating: double.parse(data['rating'].toString()),
-            address: data['address'],
-            imageUrl: data['imageUrl'],
-            mapUrl: data['mapUrl'],
-            website: data['website']);
+        return RestaurantDetail.fromJson(data);
       }).toList();
 
       return restaurantDetails;
