@@ -3,8 +3,13 @@ import 'dart:convert';
 import 'package:tabletalk_mobile/models/restaurant_search_result.dart';
 
 class RestaurantSearchService {
+  final String accessToken;
+  RestaurantSearchService({required this.accessToken});
+
   Future<List<RestaurantSearchResult>> fetchRestaurantSearchResults() async {
     final response = await http.get(Uri.parse('https://'));
+
+    //final response = await http.get(Uri.parse('https://'), headers: {"Authentication": accessToken});
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);

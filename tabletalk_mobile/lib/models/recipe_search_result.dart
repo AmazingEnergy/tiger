@@ -4,6 +4,7 @@ class RecipeSearchResult {
   final int time;
   final String imageUrl;
   final String reason;
+  final String author;
 
   RecipeSearchResult({
     required this.id,
@@ -11,6 +12,7 @@ class RecipeSearchResult {
     required this.time,
     required this.imageUrl,
     required this.reason,
+    required this.author,
   });
 
   factory RecipeSearchResult.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class RecipeSearchResult {
       time: json['time'] ?? 0,
       imageUrl: json['imageUrl'] ?? '',
       reason: json['reason'] ?? '',
+      author: json['author'] ?? ''
     );
   }
 }

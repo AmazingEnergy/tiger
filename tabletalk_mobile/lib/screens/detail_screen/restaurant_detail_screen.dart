@@ -6,6 +6,7 @@ import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class RestaurantDetailScreen extends StatelessWidget {
   final RestaurantDetail restaurantDetail;
@@ -87,7 +88,7 @@ class RestaurantDetailScreen extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             CustomImageView(
-              imagePath: restaurant.imageUrl,
+              imagePath: getImageUrl(restaurant.imageUrl),
               height: 400.v,
               width: 300.h,
               alignment: Alignment.center,
@@ -197,8 +198,18 @@ class RestaurantDetailScreen extends StatelessWidget {
     );
   }
 
+  String getImageUrl(String photoReference, {int maxWidth = 400}) {
+    var apiKey = dotenv.env['GOOGLE_API_KEY'];
+    final url = "https://maps.googleapis.com/maps/api/place/photo"
+        "?maxwidth=$maxWidth"
+        "&photoreference=$photoReference"
+        "&key=$apiKey";
+
+    return url;
+  }
+
   String generateStaticMapUrl(String address) {
-    const apiKey = 'AIzaSyDUxyJXDqkFDBlXy03vGYHsB-UKWyybifk';
+    var apiKey = dotenv.env['GOOGLE_API_KEY'];
     final encodedAddress = Uri.encodeComponent(address);
     final marker = 'markers=color:red%7Clabel:A%7C$encodedAddress';
     const zoom = '20';
