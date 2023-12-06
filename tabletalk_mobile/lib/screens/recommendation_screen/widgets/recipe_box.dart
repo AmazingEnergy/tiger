@@ -52,7 +52,7 @@ class RecipeBox extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 4), // Added spacing between lines
                     Row(
                       children: [
                         Expanded(
