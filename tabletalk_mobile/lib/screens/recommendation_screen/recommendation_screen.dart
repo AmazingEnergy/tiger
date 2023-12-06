@@ -45,7 +45,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
         throw Exception('Failed to load data');
       }
     } catch (e) {
-      // Handle exceptions here
+      // Handle exceptions
       print('Error: $e');
     } finally {
       setState(() {
@@ -64,13 +64,13 @@ class _RecommendScreenState extends State<RecommendScreen> {
               SearchBox(onSearch: (keyword, param1) {
                 callApi(keyword);
               }),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Expanded(
                 child: DefaultTabController(
                   length: 2,
                   child: Column(
                     children: <Widget>[
-                      TabBar(
+                      const TabBar(
                         indicatorWeight: 3.0,
                         labelStyle: TextStyle(
                           fontSize: 16,
@@ -117,7 +117,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
       children: loading
-          ? _buildLoadingWidgets(2) // 2 is the number of placeholder widgets
+          ? _buildLoadingWidgets(2)
           : recipes.map((e) {
               return InkWell(child: RecipeBox(model: e));
             }).toList(),
@@ -130,7 +130,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
       children: loading
-          ? _buildLoadingWidgets(2) // 2 is the number of placeholder widgets
+          ? _buildLoadingWidgets(2)
           : restaurants.map((e) {
               return InkWell(
                 child: RestaurantBox(
