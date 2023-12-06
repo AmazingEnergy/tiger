@@ -1,0 +1,259 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tabletalk_mobile/data/recipe_result_data.dart';
+import 'package:tabletalk_mobile/main.dart';
+import 'package:tabletalk_mobile/models/recipe_detail.dart';
+import 'package:tabletalk_mobile/models/recipe_search_result.dart';
+import 'package:tabletalk_mobile/models/restaurant_detail.dart';
+import 'package:tabletalk_mobile/models/restaurant_search_result.dart';
+import 'package:tabletalk_mobile/routes/app_routes.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/recipe_box.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/restaurant_box.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/search_box.dart';
+import 'package:tabletalk_mobile/services/recipe_data_service.dart';
+import 'package:tabletalk_mobile/services/recipe_result_data_service.dart';
+import 'package:tabletalk_mobile/services/restaurant_data_serivce.dart';
+import 'package:tabletalk_mobile/services/restaurant_result_data_service.dart';
+
+class RecommendScreen extends StatefulWidget {
+  final String searchText;
+  final String searchId;
+
+  const RecommendScreen(
+      {super.key, required this.searchText, required this.searchId});
+
+  @override
+  State<RecommendScreen> createState() => _RecommendScreenState();
+}
+
+class _RecommendScreenState extends State<RecommendScreen> {
+  bool loading = true;
+  List<RecipeSearchResult> recipes = List.empty(growable: true);
+
+  List<RestaurantSearchResult> restaurants = List.empty(growable: true);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(_afterPageRender);
+  }
+
+  _afterPageRender(_) {
+    callApi(widget.searchText, widget.searchId);
+  }
+
+  callApi(String keyword, String searchId) async {
+    setState(() {
+      loading = true;
+    });
+
+    try {
+      final capturedContext = context;
+      final authProvider =
+          Provider.of<AuthProvider>(capturedContext, listen: false);
+
+      if (authProvider.credentials != null) {
+        final String accessToken = authProvider.credentials!.accessToken;
+
+        RecipeSearchService recipeSearchService =
+            RecipeSearchService(accessToken: accessToken);
+        RestaurantSearchService restaurantSearchService =
+            RestaurantSearchService(accessToken: accessToken);
+
+        try {
+          recipes =
+              await recipeSearchService.fetchRecipeSearchResults(searchId);
+        } catch (recipeError) {
+          print('Error fetching recipe: $recipeError');
+        }
+
+        try {
+          restaurants = await restaurantSearchService
+              .fetchRestaurantSearchResults(searchId);
+        } catch (restaurantError) {
+          print('Error fetching restaurant: $restaurantError');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          child: Column(
+            children: [
+              SearchBox(defaultText: widget.searchText),
+              const SizedBox(height: 10),
+              Expanded(
+                child: DefaultTabController(
+                  length: 2,
+                  child: Column(
+                    children: <Widget>[
+                      const TabBar(
+                        indicatorWeight: 3.0,
+                        labelStyle: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                        tabs: [
+                          Tab(
+                            child: Text("Recipes"),
+                          ),
+                          Tab(
+                            child: Text("Restaurant"),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: _buildListRecipe(),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: _buildListRestaurant(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListRecipe() {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 15,
+      mainAxisSpacing: 15,
+      children: loading
+          ? _buildLoadingWidgets(2)
+          : recipes.map((e) {
+              return InkWell(
+                child: RecipeBox(model: e),
+                onTap: () {
+                  goToRecipeDetailScreen(context, e.id);
+                },
+              );
+            }).toList(),
+    );
+  }
+
+  Widget _buildListRestaurant() {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 15,
+      mainAxisSpacing: 15,
+      children: loading
+          ? _buildLoadingWidgets(2)
+          : restaurants.map((e) {
+              return InkWell(
+                child: RestaurantBox(
+                  model: e,
+                ),
+                onTap: () {
+                  goToRestaurantDetailScreen(context, e.id);
+                },
+              );
+            }).toList(),
+    );
+  }
+
+  List<Widget> _buildLoadingWidgets(int count) {
+    return List.generate(
+      count,
+      (index) => Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        height: 150,
+      ),
+    );
+  }
+
+  Future<RecipeDetail> getRecipeDetails(
+      BuildContext context, String recipeId) async {
+    final capturedContext = context;
+    RecipeDetail recipeDetail;
+    final authProvider =
+        Provider.of<AuthProvider>(capturedContext, listen: false);
+    if (authProvider.credentials != null) {
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      RecipeDataService recipeDataService =
+          RecipeDataService(accessToken: accessToken);
+
+      recipeDetail = await recipeDataService.fetchRecipeDetails(recipeId);
+    } else {
+      throw Exception('Failed to load data');
+    }
+
+    return recipeDetail;
+  }
+
+  void goToRecipeDetailScreen(BuildContext context, String recipeId) async {
+    RecipeDetail recipeDetail = await getRecipeDetails(context, recipeId);
+
+    // ignore: use_build_context_synchronously
+    Navigator.pushNamed(
+      context,
+      AppRoutes.recipeDetailScreen,
+      arguments: recipeDetail,
+    );
+  }
+
+  Future<RestaurantDetail> getRestaurantDetails(
+      BuildContext context, String restaurantId) async {
+    final capturedContext = context;
+    RestaurantDetail restaurantDetail;
+    final authProvider =
+        Provider.of<AuthProvider>(capturedContext, listen: false);
+    if (authProvider.credentials != null) {
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      RestaurantDataService restaurantDataService =
+          RestaurantDataService(accessToken: accessToken);
+
+      restaurantDetail =
+          await restaurantDataService.fetchRestaurantDetails(restaurantId);
+    } else {
+      throw Exception('Failed to load data');
+    }
+
+    return restaurantDetail;
+  }
+
+  void goToRestaurantDetailScreen(
+      BuildContext context, String restaurantId) async {
+    RestaurantDetail restaurantDetail =
+        await getRestaurantDetails(context, restaurantId);
+
+    // ignore: use_build_context_synchronously
+    Navigator.pushNamed(
+      context,
+      AppRoutes.restaurantDetailScreen,
+      arguments: restaurantDetail,
+    );
+  }
+}

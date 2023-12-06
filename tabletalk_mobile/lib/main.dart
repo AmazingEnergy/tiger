@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:auth0_flutter/auth0_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/theme/theme_helper.dart';
 import 'package:tabletalk_mobile/routes/app_routes.dart';
@@ -10,6 +11,7 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+  await dotenv.load(fileName: ".env");
 
   ThemeHelper().changeTheme('primary');
   AuthProvider authProvider = AuthProvider();

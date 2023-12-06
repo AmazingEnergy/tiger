@@ -10,6 +10,36 @@ class CustomTextStyles {
   static get labelLargeRed300 => theme.textTheme.labelLarge!.copyWith(
         color: appTheme.red300,
       );
+  static get bodyMediumBlack900 => theme.textTheme.bodyMedium!.copyWith(
+        color: appTheme.black900,
+      );
+  static get bodyMediumBlack900_1 => theme.textTheme.bodyMedium!.copyWith(
+        color: appTheme.black900,
+      );
+  static get bodyMediumGray900 => theme.textTheme.bodyMedium!.copyWith(
+        color: appTheme.gray900,
+      );
+  static get bodySmall12 => theme.textTheme.bodySmall!.copyWith(
+        fontSize: 12.fSize,
+      );
+  static get bodySmallBlack900 => theme.textTheme.bodySmall!.copyWith(
+        color: appTheme.black900,
+        fontSize: 8.fSize,
+      );
+  static get bodySmallBlack900_1 => theme.textTheme.bodySmall!.copyWith(
+        color: appTheme.black900,
+      );
+  // Label text style
+  static get labelMediumBlack900 => theme.textTheme.labelMedium!.copyWith(
+        color: appTheme.black900,
+      );
+  static get labelMediumWhiteA700 => theme.textTheme.labelMedium!.copyWith(
+        color: appTheme.whiteA700,
+      );
+  // Title text style
+  static get titleMediumSemiBold => theme.textTheme.titleMedium!.copyWith(
+        fontWeight: FontWeight.w600,
+      );
 }
 
 extension on TextStyle {

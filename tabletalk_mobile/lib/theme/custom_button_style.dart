@@ -27,6 +27,17 @@ class CustomButtonStyles {
           ],
         ),
       );
+  static BoxDecoration get gradientPinkToPinkADecoration => BoxDecoration(
+        borderRadius: BorderRadius.circular(10.h),
+        gradient: LinearGradient(
+          begin: const Alignment(0.5, 0),
+          end: const Alignment(0.5, 1),
+          colors: [
+            appTheme.pink300,
+            appTheme.pinkA100,
+          ],
+        ),
+      );
   // text button style
   static ButtonStyle get none => ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),

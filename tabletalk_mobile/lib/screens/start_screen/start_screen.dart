@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/main.dart';
+import 'package:tabletalk_mobile/services/restaurant_data_serivce.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 
 class StartScreen extends StatelessWidget {
@@ -35,15 +37,17 @@ class StartScreen extends StatelessWidget {
                   height: 176.v,
                   width: 325.h,
                 ),
-                SizedBox(height: 80.v),
-                SizedBox(height: 70.v),
-                SizedBox(height: 60.v),
+                SizedBox(height: 210.v),
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
                     if (authProvider.credentials == null) {
                       return CustomElevatedButton(
-                        width: 111.h,
+                        height: 50.h,
+                        width: 200.h,
                         text: "Login",
+                        buttonTextStyle: const TextStyle(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 15),
                         buttonStyle: CustomButtonStyles.none,
                         decoration: CustomButtonStyles
                             .gradientPrimaryToOnPrimaryContainerDecoration,
@@ -52,30 +56,32 @@ class StartScreen extends StatelessWidget {
                         },
                       );
                     } else {
-                      onTapStartSearching(context);
-                      return const Text("");
+                      return CustomElevatedButton(
+                        height: 50.h,
+                        width: 200.h,
+                        text: "Start Searching",
+                        buttonTextStyle: const TextStyle(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 15),
+                        rightIcon: Container(
+                          margin: EdgeInsets.only(left: 10.h),
+                          child: CustomImageView(
+                            imagePath: ImageConstant.imgIconGeneralArrowright,
+                            height: 20.adaptSize,
+                            width: 20.adaptSize,
+                          ),
+                        ),
+                        buttonStyle: CustomButtonStyles.none,
+                        decoration: CustomButtonStyles
+                            .gradientPrimaryToOnPrimaryContainerDecoration,
+                        onPressed: () {
+                          goToSearchPage(context);
+                        },
+                      );
                     }
                   },
                 ),
                 SizedBox(height: 70.v),
-                CustomElevatedButton(
-                  width: 161.h,
-                  text: "Start Searching",
-                  rightIcon: Container(
-                    margin: EdgeInsets.only(left: 14.h),
-                    child: CustomImageView(
-                      imagePath: ImageConstant.imgIconGeneralArrowright,
-                      height: 20.adaptSize,
-                      width: 20.adaptSize,
-                    ),
-                  ),
-                  buttonStyle: CustomButtonStyles.none,
-                  decoration: CustomButtonStyles
-                      .gradientPrimaryToOnPrimaryContainerDecoration,
-                  onPressed: () {
-                    onTapStartSearching(context);
-                  },
-                ),
               ],
             ),
           ),
@@ -89,7 +95,7 @@ class StartScreen extends StatelessWidget {
     await authProvider.loginAction();
   }
 
-  void onTapStartSearching(BuildContext context) async {
-    Navigator.pushNamed(context, AppRoutes.screensContainer);
+  void goToSearchPage(BuildContext context) async {
+    Navigator.pushNamed(context, AppRoutes.searchScreen);
   }
 }

@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/screens/search_screen/search_screen.dart';
 import 'package:tabletalk_mobile/widgets/custom_bottom_bar.dart';
 
 class ScreensContainer extends StatelessWidget {
@@ -20,25 +19,17 @@ class ScreensContainer extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          Container(
-            width: mediaQueryData.size.width,
-            height: mediaQueryData.size.height,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.onPrimary,
-              image: DecorationImage(
-                image: AssetImage(ImageConstant.imgStartingPage),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           Navigator(
             key: navigatorKey,
             initialRoute: AppRoutes.searchScreen,
-            onGenerateRoute: (routeSetting) => PageRouteBuilder(
-              pageBuilder: (ctx, ani, ani1) =>
-                  getCurrentPage(routeSetting.name!),
-              transitionDuration: const Duration(seconds: 0),
-            ),
+            onGenerateRoute: (routeSetting) {
+              final String currentRouteName = routeSetting.name!;
+              return PageRouteBuilder(
+                pageBuilder: (ctx, ani, ani1) =>
+                    getCurrentPage(currentRouteName, ctx),
+                transitionDuration: const Duration(seconds: 0),
+              );
+            },
           ),
         ],
       ),
@@ -52,8 +43,8 @@ class ScreensContainer extends StatelessWidget {
       right: 0,
       bottom: 0,
       child: CustomBottomBar(onChanged: (BottomBarEnum type) {
-        Navigator.pushNamed(
-            navigatorKey.currentContext!, getCurrentRoute(type));
+        final String currentRouteName = getCurrentRoute(type);
+        Navigator.pushNamed(navigatorKey.currentContext!, currentRouteName);
       }),
     );
   }
@@ -71,12 +62,13 @@ class ScreensContainer extends StatelessWidget {
     }
   }
 
-  Widget getCurrentPage(String currentRoute) {
-    switch (currentRoute) {
-      case AppRoutes.searchScreen:
-        return SearchScreen();
-      default:
-        return const DefaultWidget();
+  Widget getCurrentPage(String currentRoute, BuildContext context) {
+    final WidgetBuilder? builder = AppRoutes.routes[currentRoute];
+    if (builder != null) {
+      return builder(context);
+    } else {
+      // Handle case where the route is not found
+      return const Center(child: Text('Route not found'));
     }
   }
 }

@@ -3,7 +3,7 @@ import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/widgets/base_button.dart';
 
 class CustomElevatedButton extends BaseButton {
-  CustomElevatedButton({
+  const CustomElevatedButton({
     Key? key,
     this.decoration,
     this.leftIcon,
@@ -46,11 +46,10 @@ class CustomElevatedButton extends BaseButton {
   }
 
   Widget get buildElevatedButtonWidget => Container(
-        height: height ?? 41.v,
-        width: width ?? double.maxFinite,
+        height: this.height ?? 16.v,
+        width: this.width ?? double.maxFinite,
         margin: margin,
-        decoration: decoration ??
-            CustomButtonStyles.gradientPrimaryToOnPrimaryContainerDecoration,
+        decoration: decoration,
         child: ElevatedButton(
           style: buttonStyle,
           onPressed: isDisabled ?? false ? null : onPressed ?? () {},
@@ -61,7 +60,7 @@ class CustomElevatedButton extends BaseButton {
               leftIcon ?? const SizedBox.shrink(),
               Text(
                 text,
-                style: buttonTextStyle ?? theme.textTheme.labelLarge,
+                style: buttonTextStyle ?? CustomTextStyles.bodySmallBlack900,
               ),
               rightIcon ?? const SizedBox.shrink(),
             ],
