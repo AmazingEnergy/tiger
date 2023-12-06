@@ -4,13 +4,13 @@ import 'dart:convert';
 
 class RestaurantDataService {
   final String accessToken;
-  final String id;
 
-  RestaurantDataService({required this.accessToken, required this.id});
+  RestaurantDataService({required this.accessToken});
 
-  Future<RestaurantDetail> fetchRestaurantDetails() async {
+  Future<RestaurantDetail> fetchRestaurantDetails(String restaurantId) async {
     final response = await http.get(
-      Uri.parse('https://api.amzegy.com/core/api/v1/search/restaurants/$id'),
+      Uri.parse(
+          'https://api.amzegy.com/core/api/v1/search/restaurants/$restaurantId'),
       headers: {"Authorization": "Bearer $accessToken"},
     );
 

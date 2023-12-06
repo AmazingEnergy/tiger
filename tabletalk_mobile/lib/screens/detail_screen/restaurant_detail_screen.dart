@@ -22,57 +22,60 @@ class RestaurantDetailScreen extends StatelessWidget {
       extendBody: true,
       extendBodyBehindAppBar: true,
       body: SafeArea(
-        child: Stack(
-          children: [
-            Container(
-              width: double.maxFinite,
-              padding: EdgeInsets.symmetric(vertical: 35.v),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 6.v),
-                  CustomImageView(
-                    imagePath: ImageConstant.imgArrowLeft,
-                    height: 20.adaptSize,
-                    width: 20.adaptSize,
-                    margin: EdgeInsets.only(left: 30.h),
-                    onTap: () {
-                      onTapImgArrowLeft(context);
-                    },
-                  ),
-                  SizedBox(height: 10.v),
-                  _buildCardSection(context, restaurantDetail),
-                  SizedBox(height: 10.v),
-                  _buildFiveSection(context, restaurantDetail),
-                  SizedBox(height: 25.v),
-                  Container(
-                    width: 295.h,
-                    margin: EdgeInsets.only(left: 30.h, right: 49.h),
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Address:  ",
-                            style:
-                                CustomTextStyles.bodyMediumBlack900_1.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: "${restaurantDetail.address}\r",
-                            style: CustomTextStyles.bodyMediumBlack900_1,
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.left,
+        child: SingleChildScrollView(
+          // Wrap with SingleChildScrollView
+          child: Stack(
+            children: [
+              Container(
+                width: double.maxFinite,
+                padding: EdgeInsets.symmetric(vertical: 35.v),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 6.v),
+                    CustomImageView(
+                      imagePath: ImageConstant.imgArrowLeft,
+                      height: 20.adaptSize,
+                      width: 20.adaptSize,
+                      margin: EdgeInsets.only(left: 30.h),
+                      onTap: () {
+                        onTapImgArrowLeft(context);
+                      },
                     ),
-                  ),
-                  SizedBox(height: 25.v),
-                  _buildOneSection(context, restaurantDetail),
-                ],
+                    SizedBox(height: 10.v),
+                    _buildCardSection(context, restaurantDetail),
+                    SizedBox(height: 10.v),
+                    _buildFiveSection(context, restaurantDetail),
+                    SizedBox(height: 25.v),
+                    Container(
+                      width: 295.h,
+                      margin: EdgeInsets.only(left: 30.h, right: 49.h),
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Address:  ",
+                              style: CustomTextStyles.bodyMediumBlack900_1
+                                  .copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: "${restaurantDetail.address}\r",
+                              style: CustomTextStyles.bodyMediumBlack900_1,
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    SizedBox(height: 25.v),
+                    _buildOneSection(context, restaurantDetail),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -107,46 +110,20 @@ class RestaurantDetailScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 159.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "${restaurant.name} ",
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                      CustomElevatedButton(
-                        height: 18.h,
-                        width: 42.h,
-                        text: "${restaurant.rating}",
-                        buttonTextStyle:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                        margin: EdgeInsets.only(top: 3.v, bottom: 4.v),
-                        leftIcon: Container(
-                          margin: EdgeInsets.only(right: 3.h),
-                          child: CustomImageView(
-                            imagePath: ImageConstant.imgStar,
-                            height: 10.adaptSize,
-                            width: 10.adaptSize,
-                          ),
-                        ),
-                        buttonStyle: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(0, 0, 0, 0).withOpacity(0.0),
-                        ),
-                      ),
-                    ],
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${restaurant.name} ",
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-                Text("Food restaurant", style: theme.textTheme.bodyMedium),
-              ],
+                  Text("Food restaurant", style: theme.textTheme.bodyMedium),
+                ],
+              ),
             ),
             CustomElevatedButton(
               height: 33.v,

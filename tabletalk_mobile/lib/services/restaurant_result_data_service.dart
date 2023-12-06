@@ -6,10 +6,13 @@ class RestaurantSearchService {
   final String accessToken;
   RestaurantSearchService({required this.accessToken});
 
-  Future<List<RestaurantSearchResult>> fetchRestaurantSearchResults() async {
-    final response = await http.get(Uri.parse('https://'));
-
-    //final response = await http.get(Uri.parse('https://'), headers: {"Authentication": accessToken});
+  Future<List<RestaurantSearchResult>> fetchRestaurantSearchResults(
+      String searchId) async {
+    final response = await http.get(
+      Uri.parse(
+          'https://api.amzegy.com/core/api/v1/search/$searchId/restaurants?latitude=10.740710811318294&longitude=106.7361430233963'),
+      headers: {"Authorization": "Bearer $accessToken"},
+    );
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);

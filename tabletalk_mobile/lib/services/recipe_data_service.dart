@@ -4,21 +4,19 @@ import 'dart:convert';
 
 class RecipeDataService {
   final String accessToken;
-  final String id;
-  RecipeDataService({required this.accessToken, required this.id});
+  RecipeDataService({required this.accessToken});
 
-  Future<List<RecipeDetail>> fetchRecipeDetails() async {
+  Future<RecipeDetail> fetchRecipeDetails(String recipeId) async {
     final response = await http.get(
-        Uri.parse('https://api.amzegy.com/core/api/v1/search/recipes/$id'),
-        headers: {"Authentication": accessToken});
+      Uri.parse('https://api.amzegy.com/core/api/v1/search/recipes/$recipeId'),
+      headers: {"Authorization": "Bearer $accessToken"},
+    );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonData = json.decode(response.body);
+      Map<String, dynamic> jsonData = json.decode(response.body);
 
-      List<RecipeDetail> recipeDetails =
-          jsonData.map((data) => RecipeDetail.fromJson(data)).toList();
-
-      return recipeDetails;
+      RecipeDetail recipeDetail = RecipeDetail.fromJson(jsonData);
+      return recipeDetail;
     } else {
       throw Exception(
           'Failed to load data. Error code: ${response.statusCode}');

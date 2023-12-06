@@ -26,24 +26,6 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     startScreen: (context) => const StartScreen(),
     searchScreen: (context) => SearchScreen(),
-    recommendationScreen: (context) {
-      final List<RecipeSearchResult>? recipeResults = ModalRoute.of(context)!
-          .settings
-          .arguments as List<RecipeSearchResult>?;
-      final List<RecipeSearchResult> defaultRecipeResult =
-          recipeSearchResultData;
-
-      final List<RestaurantSearchResult>? restaurantResults =
-          ModalRoute.of(context)!.settings.arguments
-              as List<RestaurantSearchResult>?;
-      final List<RestaurantSearchResult> defaultRestaurantResult =
-          restaurantSearchResultData;
-
-      return RecommendationScreen(
-        recipeResult: recipeResults ?? defaultRecipeResult,
-        restaurantResult: restaurantResults ?? defaultRestaurantResult,
-      );
-    },
     screensContainer: (context) => ScreensContainer(),
     recipeDetailScreen: (context) {
       final RecipeDetail? recipeDetail =
@@ -59,6 +41,16 @@ class AppRoutes {
       final defaultRestaurantDetail = restaurants[0];
       return RestaurantDetailScreen(
         restaurantDetail: restaurantDetail ?? defaultRestaurantDetail,
+      );
+    },
+    recommendationScreen: (context) {
+      final Map<String, dynamic> args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      final String searchText = args['searchText'];
+      final String searchId = args['searchId'];
+      return RecommendScreen(
+        searchText: searchText,
+        searchId: searchId,
       );
     },
   };

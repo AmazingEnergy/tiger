@@ -42,8 +42,12 @@ class StartScreen extends StatelessWidget {
                   builder: (context, authProvider, child) {
                     if (authProvider.credentials == null) {
                       return CustomElevatedButton(
-                        width: 111.h,
+                        height: 50.h,
+                        width: 200.h,
                         text: "Login",
+                        buttonTextStyle: const TextStyle(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 15),
                         buttonStyle: CustomButtonStyles.none,
                         decoration: CustomButtonStyles
                             .gradientPrimaryToOnPrimaryContainerDecoration,
@@ -71,7 +75,7 @@ class StartScreen extends StatelessWidget {
                         decoration: CustomButtonStyles
                             .gradientPrimaryToOnPrimaryContainerDecoration,
                         onPressed: () {
-                          onTapStartSearching(context);
+                          goToSearchPage(context);
                         },
                       );
                     }
@@ -91,30 +95,7 @@ class StartScreen extends StatelessWidget {
     await authProvider.loginAction();
   }
 
-  void onTapStartSearching(BuildContext context) async {
-    final capturedContext = context;
-
-    final authProvider =
-        Provider.of<AuthProvider>(capturedContext, listen: false);
-
-    if (authProvider.credentials != null) {
-      final String accessToken = authProvider.credentials!.accessToken;
-      RestaurantDataService restaurantDataService = RestaurantDataService(
-          accessToken: accessToken, id: "dc9d4fe8-aa54-465d-b714-d8830890dc99");
-      var restaurantData = await restaurantDataService.fetchRestaurantDetails();
-
-      // ignore: use_build_context_synchronously
-      Navigator.pushNamed(
-        capturedContext,
-        AppRoutes.restaurantDetailScreen,
-        arguments: restaurantData,
-      );
-
-      //Navigator.pushNamed(capturedContext, AppRoutes.screensContainer);
-    } else {
-      if (kDebugMode) {
-        print("Access token is not available");
-      }
-    }
+  void goToSearchPage(BuildContext context) async {
+    Navigator.pushNamed(context, AppRoutes.searchScreen);
   }
 }

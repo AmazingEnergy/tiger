@@ -7,16 +7,24 @@ class SearchIdDataService {
 
   SearchIdDataService({required this.accessToken});
 
-  Future<SearchId> fetchSearchIds() async {
-    final response = await http.get(
+  Future<SearchId> fetchSearchIds(String searchText) async {
+    print("Search api");
+    print(searchText);
+    final response = await http.post(
       Uri.parse('https://api.amzegy.com/core/api/v1/search'),
-      headers: {"Authorization": "Bearer $accessToken"},
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({"searchText": searchText}),
     );
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
 
       SearchId searchId = SearchId.fromJson(jsonData);
+
+      print(searchId.id);
       return searchId;
     } else {
       throw Exception(

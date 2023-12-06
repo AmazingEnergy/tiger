@@ -21,7 +21,7 @@ class RecipeDetail {
     return RecipeDetail(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      time: json['time'] ?? 0,
+      time: int.tryParse(json['time'].toString()) ?? 0,
       author: json['author'] ?? '',
       imageUrl: json['imageUrl'] ?? '',
       ingredients: List<String>.from(json['ingredients'] ?? []),
@@ -33,7 +33,7 @@ class RecipeDetail {
     return List<Instruction>.from(
       instructions?.map(
             (instruction) => Instruction(
-              step: instruction['step'] ?? 0,
+              step: instruction['step'].toString(),
               description: instruction['description'] ?? '',
             ),
           ) ??
@@ -43,7 +43,7 @@ class RecipeDetail {
 }
 
 class Instruction {
-  final int step;
+  final String step;
   final String description;
 
   Instruction({

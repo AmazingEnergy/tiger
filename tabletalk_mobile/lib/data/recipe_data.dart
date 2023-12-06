@@ -23,17 +23,17 @@ final recipes = [
       "rice",
     ],
     instructions: [
-      Instruction(step: 1, description: "Preheat oven to 350 degrees"),
+      Instruction(step: "1", description: "Preheat oven to 350 degrees"),
       Instruction(
-          step: 2,
+          step: "2",
           description: "Mix bread crumbs and Parmesan cheese in a bowl"),
       Instruction(
-          step: 3,
+          step: "3",
           description: "Dip chicken in egg and then in bread crumb mixture"),
-      Instruction(step: 4, description: "Place chicken on a baking sheet"),
-      Instruction(step: 5, description: "Bake for 20 minutes"),
-      Instruction(step: 6, description: "Bake for 20 minutes"),
-      Instruction(step: 7, description: "Bake for 20 minutes"),
+      Instruction(step: "4", description: "Place chicken on a baking sheet"),
+      Instruction(step: "5", description: "Bake for 20 minutes"),
+      Instruction(step: "6", description: "Bake for 20 minutes"),
+      Instruction(step: "7", description: "Bake for 20 minutes"),
     ],
   ),
 ];
