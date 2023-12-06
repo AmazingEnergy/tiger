@@ -39,7 +39,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
   }
 
   _afterPageRender(_) {
-    callApi(widget.searchText, "50a4ce4a-7c2f-4a2f-88c1-314f0cc0551a");
+    callApi(widget.searchText, widget.searchId);
   }
 
   callApi(String keyword, String searchId) async {
