@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/main.dart';
-import 'package:tabletalk_mobile/services/recipe_data_service.dart';
-import 'package:tabletalk_mobile/services/recipe_result_data_service.dart';
 import 'package:tabletalk_mobile/services/restaurant_data_serivce.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 
@@ -54,7 +52,6 @@ class StartScreen extends StatelessWidget {
                         },
                       );
                     } else {
-                      //onTapStartSearching(context);
                       return CustomElevatedButton(
                         height: 50.h,
                         width: 200.h,
@@ -95,14 +92,13 @@ class StartScreen extends StatelessWidget {
   }
 
   void onTapStartSearching(BuildContext context) async {
-
     final capturedContext = context;
 
     final authProvider =
         Provider.of<AuthProvider>(capturedContext, listen: false);
 
     if (authProvider.credentials != null) {
-      final String accessToken = authProvider.credentials!.accessToken ?? "";
+      final String accessToken = authProvider.credentials!.accessToken;
       RestaurantDataService restaurantDataService = RestaurantDataService(
           accessToken: accessToken, id: "dc9d4fe8-aa54-465d-b714-d8830890dc99");
       var restaurantData = await restaurantDataService.fetchRestaurantDetails();
