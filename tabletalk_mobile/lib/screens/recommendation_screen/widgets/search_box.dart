@@ -27,13 +27,13 @@ class SearchBox extends StatelessWidget {
             Container(
               child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Text(
                       "Search Results...",
                       style: TextStyle(
                         fontSize: 20,
                         fontFamily: 'Poppins',
-                        color: const Color(0xFFFD637C),
+                        color: Color(0xFFFD637C),
                         fontWeight: FontWeight.normal,
                       ),
                     ),
@@ -62,7 +62,7 @@ class SearchBox extends StatelessWidget {
                       focusNode: _searchFocusNode,
                       child: CustomTextFormField(
                         enabled: false,
-                        hintText: defaultText, // text
+                        hintText: defaultText,
                         textStyle: const TextStyle(color: Colors.black),
                         autofocus: false,
                       ),
