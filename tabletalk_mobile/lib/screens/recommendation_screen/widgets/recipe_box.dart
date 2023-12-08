@@ -53,7 +53,7 @@ class RecipeBox extends StatelessWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 5,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -64,12 +64,16 @@ class RecipeBox extends StatelessWidget {
                           child: Text(
                             model.author,
                             style: const TextStyle(color: Colors.grey),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const Icon(Icons.alarm, color: Colors.grey),
                         Text(
                           "${model.time}min",
                           style: const TextStyle(color: Colors.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     )
