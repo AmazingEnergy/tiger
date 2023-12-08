@@ -85,6 +85,8 @@ class _RecommendScreenState extends State<RecommendScreen> {
     }
   }
 
+  List<Color> loadingWidgetColors = List.filled(8, Colors.grey[300]!);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,7 +149,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
       children: loading
-          ? _buildLoadingWidgets(2)
+          ? _buildLoadingWidgets(8)
           : recipes.map((e) {
               return InkWell(
                 child: RecipeBox(model: e),
@@ -182,14 +184,26 @@ class _RecommendScreenState extends State<RecommendScreen> {
   List<Widget> _buildLoadingWidgets(int count) {
     return List.generate(
       count,
-      (index) => Container(
+      (index) => AnimatedContainer(
+        duration: Duration(seconds: 1),
         decoration: BoxDecoration(
-          color: Colors.grey[300],
+          color: loadingWidgetColors[index],
           borderRadius: BorderRadius.circular(8),
         ),
         height: 150,
       ),
     );
+  }
+
+  void startColorChangingAnimation() {
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        loadingWidgetColors = List.generate(
+          8,
+          (index) => index % 2 == 0 ? Colors.grey[300]! : Colors.grey[100]!,
+        );
+      });
+    });
   }
 
   Future<RecipeDetail> getRecipeDetails(

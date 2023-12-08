@@ -33,12 +33,14 @@ class RestaurantBox extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                    size: 30,
+                GestureDetector(
+                  onTap: () {
+                    _showInfoDialog(context);
+                  },
+                  child: Container(
+                    alignment: Alignment.centerRight,
+                    child: const Icon(Icons.info_outline,
+                        color: Colors.white, size: 30),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -47,7 +49,7 @@ class RestaurantBox extends StatelessWidget {
                     Expanded(
                       child: Text(
                         model.name,
-                        maxLines: 2,
+                        maxLines: 5,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
@@ -92,6 +94,67 @@ class RestaurantBox extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showInfoDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
+      ),
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: const Text(
+                'Why We Choose This',
+                style: TextStyle(
+                  color: Color(0xFFFD637C),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: Text(
+                model.reason,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFD637C),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Close',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
