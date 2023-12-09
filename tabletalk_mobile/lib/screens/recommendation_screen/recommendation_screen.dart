@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tabletalk_mobile/data/recipe_result_data.dart';
 import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
@@ -20,7 +21,8 @@ class RecommendScreen extends StatefulWidget {
   final String searchId;
 
   const RecommendScreen(
-      {super.key, required this.searchText, required this.searchId});
+      {Key? key, required this.searchText, required this.searchId})
+      : super(key: key);
 
   @override
   State<RecommendScreen> createState() => _RecommendScreenState();
@@ -29,13 +31,12 @@ class RecommendScreen extends StatefulWidget {
 class _RecommendScreenState extends State<RecommendScreen> {
   bool loading = true;
   List<RecipeSearchResult> recipes = List.empty(growable: true);
-
   List<RestaurantSearchResult> restaurants = List.empty(growable: true);
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(_afterPageRender);
+    WidgetsBinding.instance!.addPostFrameCallback(_afterPageRender);
   }
 
   _afterPageRender(_) {
@@ -84,8 +85,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
       });
     }
   }
-
-  List<Color> loadingWidgetColors = List.filled(8, Colors.grey[300]!);
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +148,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
       children: loading
-          ? _buildLoadingWidgets(8)
+          ? _buildShimmerLoadingWidgets(8)
           : recipes.map((e) {
               return InkWell(
                 child: RecipeBox(model: e),
@@ -167,12 +166,10 @@ class _RecommendScreenState extends State<RecommendScreen> {
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
       children: loading
-          ? _buildLoadingWidgets(2)
+          ? _buildShimmerLoadingWidgets(2)
           : restaurants.map((e) {
               return InkWell(
-                child: RestaurantBox(
-                  model: e,
-                ),
+                child: RestaurantBox(model: e),
                 onTap: () {
                   goToRestaurantDetailScreen(context, e.id);
                 },
@@ -181,16 +178,19 @@ class _RecommendScreenState extends State<RecommendScreen> {
     );
   }
 
-  List<Widget> _buildLoadingWidgets(int count) {
+  List<Widget> _buildShimmerLoadingWidgets(int count) {
     return List.generate(
       count,
-      (index) => AnimatedContainer(
-        duration: Duration(seconds: 1),
-        decoration: BoxDecoration(
-          color: loadingWidgetColors[index],
-          borderRadius: BorderRadius.circular(8),
+      (index) => Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          height: 150,
         ),
-        height: 150,
       ),
     );
   }
@@ -198,10 +198,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
   void startColorChangingAnimation() {
     Future.delayed(Duration(milliseconds: 500), () {
       setState(() {
-        loadingWidgetColors = List.generate(
-          8,
-          (index) => index % 2 == 0 ? Colors.grey[300]! : Colors.grey[100]!,
-        );
+        // Add your color changing animation logic here if needed
       });
     });
   }
@@ -270,4 +267,38 @@ class _RecommendScreenState extends State<RecommendScreen> {
       arguments: restaurantDetail,
     );
   }
+}
+
+Future<RestaurantDetail> getRestaurantDetails(
+    BuildContext context, String restaurantId) async {
+  final capturedContext = context;
+  RestaurantDetail restaurantDetail;
+  final authProvider =
+      Provider.of<AuthProvider>(capturedContext, listen: false);
+  if (authProvider.credentials != null) {
+    final String accessToken = authProvider.credentials!.accessToken;
+
+    RestaurantDataService restaurantDataService =
+        RestaurantDataService(accessToken: accessToken);
+
+    restaurantDetail =
+        await restaurantDataService.fetchRestaurantDetails(restaurantId);
+  } else {
+    throw Exception('Failed to load data');
+  }
+
+  return restaurantDetail;
+}
+
+void goToRestaurantDetailScreen(
+    BuildContext context, String restaurantId) async {
+  RestaurantDetail restaurantDetail =
+      await getRestaurantDetails(context, restaurantId);
+
+  // ignore: use_build_context_synchronously
+  Navigator.pushNamed(
+    context,
+    AppRoutes.restaurantDetailScreen,
+    arguments: restaurantDetail,
+  );
 }

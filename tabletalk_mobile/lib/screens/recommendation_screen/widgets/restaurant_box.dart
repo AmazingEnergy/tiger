@@ -49,7 +49,7 @@ class RestaurantBox extends StatelessWidget {
                     Expanded(
                       child: Text(
                         model.name,
-                        maxLines: 5,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
