@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/widgets/custom_bottom_bar.dart';
 
-class ScreensContainer extends StatelessWidget {
-  ScreensContainer({super.key});
+class ScreensContainer extends StatefulWidget {
+  ScreensContainer({Key? key}) : super(key: key);
 
+  @override
+  _ScreensContainerState createState() => _ScreensContainerState();
+}
+
+class _ScreensContainerState extends State<ScreensContainer> {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey();
 
   @override
@@ -19,44 +24,46 @@ class ScreensContainer extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          Navigator(
-            key: navigatorKey,
-            initialRoute: AppRoutes.searchScreen,
-            onGenerateRoute: (routeSetting) {
-              final String currentRouteName = routeSetting.name!;
-              return PageRouteBuilder(
-                pageBuilder: (ctx, ani, ani1) =>
-                    getCurrentPage(currentRouteName, ctx),
-                transitionDuration: const Duration(seconds: 0),
-              );
-            },
+          // Your Screen Content
+          Positioned.fill(
+            child: Navigator(
+              key: navigatorKey,
+              initialRoute: AppRoutes.searchScreen,
+              onGenerateRoute: (routeSetting) {
+                final String currentRouteName = routeSetting.name!;
+                return PageRouteBuilder(
+                  pageBuilder: (ctx, ani, ani1) =>
+                      getCurrentPage(currentRouteName, ctx),
+                  transitionDuration: const Duration(seconds: 0),
+                );
+              },
+            ),
+          ),
+
+          // Your Bottom Navigation Bar
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: CustomBottomBar(onChanged: (BottomBarEnum type) {
+              final String currentRouteName = getCurrentRoute(type);
+              Navigator.pushNamed(
+                  navigatorKey.currentContext!, currentRouteName);
+            }),
           ),
         ],
       ),
-      bottomNavigationBar: _buildBottomBar(context),
-    );
-  }
-
-  Widget _buildBottomBar(BuildContext context) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: CustomBottomBar(onChanged: (BottomBarEnum type) {
-        final String currentRouteName = getCurrentRoute(type);
-        Navigator.pushNamed(navigatorKey.currentContext!, currentRouteName);
-      }),
     );
   }
 
   String getCurrentRoute(BottomBarEnum type) {
     switch (type) {
       case BottomBarEnum.Clock:
-        return "/";
+        return AppRoutes.profileScreen;
       case BottomBarEnum.toolbarsearch:
         return AppRoutes.searchScreen;
       case BottomBarEnum.User:
-        return "/";
+        return AppRoutes.profileScreen;
       default:
         return "/";
     }

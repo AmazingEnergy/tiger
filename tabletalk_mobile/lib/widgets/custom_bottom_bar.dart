@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 
 class CustomBottomBar extends StatefulWidget {
-  CustomBottomBar({super.key, this.onChanged});
+  CustomBottomBar({Key? key, this.onChanged}) : super(key: key);
 
-  Function(BottomBarEnum)? onChanged;
+  final Function(BottomBarEnum)? onChanged;
 
   @override
   CustomBottomBarState createState() => CustomBottomBarState();
 }
 
 class CustomBottomBarState extends State<CustomBottomBar> {
-  int selectedIndex = 0;
+  int selectedIndex = 1;
 
   List<BottomMenuModel> bottomMenuList = [
     BottomMenuModel(
@@ -30,7 +30,7 @@ class CustomBottomBarState extends State<CustomBottomBar> {
       icon: ImageConstant.imgUser,
       activeIcon: ImageConstant.imgUser,
       type: BottomBarEnum.User,
-    )
+    ),
   ];
 
   @override
@@ -59,10 +59,10 @@ class CustomBottomBarState extends State<CustomBottomBar> {
         elevation: 0,
         currentIndex: selectedIndex,
         type: BottomNavigationBarType.fixed,
-        items: List.generate(bottomMenuList.length, (index) {
+        items: bottomMenuList.map((menu) {
           return BottomNavigationBarItem(
             icon: CustomImageView(
-              imagePath: bottomMenuList[index].icon,
+              imagePath: menu.icon,
               height: 29.v,
               width: 33.h,
               color: appTheme.gray500,
@@ -72,7 +72,7 @@ class CustomBottomBarState extends State<CustomBottomBar> {
                 borderRadius: BorderRadiusStyle.circleBorder21,
               ),
               child: CustomImageView(
-                imagePath: bottomMenuList[index].activeIcon,
+                imagePath: menu.activeIcon,
                 height: 30.v,
                 width: 50.h,
                 color: theme.colorScheme.onPrimary,
@@ -84,11 +84,12 @@ class CustomBottomBarState extends State<CustomBottomBar> {
             ),
             label: '',
           );
-        }),
+        }).toList(),
         onTap: (index) {
-          selectedIndex = index;
+          setState(() {
+            selectedIndex = 1;
+          });
           widget.onChanged?.call(bottomMenuList[index].type);
-          setState(() {});
         },
       ),
     );
@@ -108,35 +109,7 @@ class BottomMenuModel {
     required this.type,
   });
 
-  String icon;
-
-  String activeIcon;
-
-  BottomBarEnum type;
-}
-
-class DefaultWidget extends StatelessWidget {
-  const DefaultWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.all(10),
-      child: const Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Please replace the respective Widget here',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  final String icon;
+  final String activeIcon;
+  final BottomBarEnum type;
 }
