@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/theme/theme_helper.dart';
 import 'package:tabletalk_mobile/routes/app_routes.dart';
+import 'package:location/location.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,9 +17,16 @@ void main() async {
   ThemeHelper().changeTheme('primary');
   AuthProvider authProvider = AuthProvider();
   await authProvider.loadCredentials();
+
+  LocationProvider locationProvider = LocationProvider();
+  await locationProvider.getCurrentLocation();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => authProvider,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => authProvider),
+        ChangeNotifierProvider(create: (_) => locationProvider),
+      ],
       child: const MyApp(),
     ),
   );
@@ -36,7 +44,6 @@ class AuthProvider with ChangeNotifier {
     if (isLoggedIn) {
       _credentials = await _auth0.credentialsManager.credentials();
       notifyListeners();
-      print(_credentials?.accessToken);
     }
   }
 
@@ -46,12 +53,10 @@ class AuthProvider with ChangeNotifier {
           .webAuthentication(scheme: "tabletalk")
           .login(audience: "https://api.amzegy.com/core/");
       _credentials = credentials;
-      print("accessToken");
-      print(_credentials?.accessToken);
       await _auth0.credentialsManager.storeCredentials(credentials);
-
       notifyListeners();
     } catch (e, s) {
+      logoutAction();
       debugPrint('[AuthProvider] login error: $e - stack: $s');
     }
   }
@@ -59,12 +64,30 @@ class AuthProvider with ChangeNotifier {
   Future<void> logoutAction() async {
     await _auth0.webAuthentication(scheme: "tabletalk").logout();
     _credentials = null;
+    //final cookieManager = WebviewCookieManager();
+    //cookieManager.clearCookies;
     notifyListeners();
   }
 }
 
+class LocationProvider with ChangeNotifier {
+  final Location _location = Location();
+  LocationData? _currentLocation;
+
+  LocationData? get currentLocation => _currentLocation;
+
+  Future<void> getCurrentLocation() async {
+    try {
+      _currentLocation = await _location.getLocation();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('[LocationProvider] Error getting location: $e');
+    }
+  }
+}
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key});
 
   @override
   Widget build(BuildContext context) {

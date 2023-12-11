@@ -129,6 +129,7 @@ class RestaurantDetailScreen extends StatelessWidget {
               height: 33.v,
               width: 143.h,
               text: "Visit Website",
+              isDisabled: restaurant.website == '',
               margin: EdgeInsets.only(left: 13.h, top: 13.v, bottom: 14.v),
               buttonStyle: CustomButtonStyles.none,
               decoration: CustomButtonStyles.gradientPinkToPinkADecoration,
