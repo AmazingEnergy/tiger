@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tabletalk_mobile/data/recipe_data.dart';
-import 'package:tabletalk_mobile/data/restaurant_data.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
@@ -27,17 +25,15 @@ class AppRoutes {
     recipeDetailScreen: (context) {
       final RecipeDetail recipeDetail =
           ModalRoute.of(context)!.settings.arguments as RecipeDetail;
-      //final defaultRecipeDetail = recipes[0];
       return RecipeDetailScreen(
-        recipeDetail: recipeDetail //?? defaultRecipeDetail,
+        recipeDetail: recipeDetail
       );
     },
     restaurantDetailScreen: (context) {
       final RestaurantDetail restaurantDetail =
           ModalRoute.of(context)!.settings.arguments as RestaurantDetail;
-      //final defaultRestaurantDetail = restaurants[0];
       return RestaurantDetailScreen(
-        restaurantDetail: restaurantDetail //?? defaultRestaurantDetail,
+        restaurantDetail: restaurantDetail
       );
     },
     recommendationScreen: (context) {

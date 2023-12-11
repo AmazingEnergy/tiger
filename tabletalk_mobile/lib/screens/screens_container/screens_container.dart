@@ -59,22 +59,17 @@ class _ScreensContainerState extends State<ScreensContainer> {
               },
             ),
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: CustomBottomBar(onChanged: (BottomBarEnum type) {
-              final String currentRouteName = getCurrentRoute(type);
-              if (navigatorKey.currentContext != null) {
-                Navigator.pushNamed(
-                  navigatorKey.currentContext!,
-                  currentRouteName,
-                );
-              }
-            }),
-          ),
         ],
       ),
+      bottomNavigationBar: CustomBottomBar(onChanged: (BottomBarEnum type) {
+        final String currentRouteName = getCurrentRoute(type);
+        if (navigatorKey.currentContext != null) {
+          Navigator.pushNamed(
+            navigatorKey.currentContext!,
+            currentRouteName,
+          );
+        }
+      }),
     );
   }
 

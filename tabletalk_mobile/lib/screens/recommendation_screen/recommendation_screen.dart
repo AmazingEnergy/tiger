@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -24,8 +22,7 @@ class RecommendScreen extends StatefulWidget {
   final String searchId;
 
   const RecommendScreen(
-      {Key? key, required this.searchText, required this.searchId})
-      : super(key: key);
+      {super.key, required this.searchText, required this.searchId});
 
   @override
   State<RecommendScreen> createState() => _RecommendScreenState();
@@ -39,7 +36,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback(_afterPageRender);
+    WidgetsBinding.instance.addPostFrameCallback(_afterPageRender);
   }
 
   _afterPageRender(_) {
@@ -100,7 +97,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
           child: Column(
             children: [
               SearchBox(defaultText: widget.searchText),

@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/theme/theme_helper.dart';
 import 'package:tabletalk_mobile/routes/app_routes.dart';
 import 'package:location/location.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

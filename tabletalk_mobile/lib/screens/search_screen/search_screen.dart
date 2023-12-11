@@ -140,7 +140,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     try {
       String searchId = await getSearchId(context, searchText);
-
+      print(searchId);
       // ignore: use_build_context_synchronously
       await Navigator.push(
         context,
