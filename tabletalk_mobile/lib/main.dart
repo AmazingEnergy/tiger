@@ -44,8 +44,6 @@ class AuthProvider with ChangeNotifier {
     if (isLoggedIn) {
       _credentials = await _auth0.credentialsManager.credentials();
       notifyListeners();
-    } else {
-      logoutAction();
     }
   }
 
