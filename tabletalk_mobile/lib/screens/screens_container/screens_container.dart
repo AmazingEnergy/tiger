@@ -24,31 +24,53 @@ class _ScreensContainerState extends State<ScreensContainer> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // Your Screen Content
           Positioned.fill(
             child: Navigator(
               key: navigatorKey,
               initialRoute: AppRoutes.searchScreen,
               onGenerateRoute: (routeSetting) {
                 final String currentRouteName = routeSetting.name!;
-                return PageRouteBuilder(
-                  pageBuilder: (ctx, ani, ani1) =>
-                      getCurrentPage(currentRouteName, ctx),
-                  transitionDuration: const Duration(seconds: 0),
+
+                // Check if the route is one of the three main pages
+                if ([
+                  AppRoutes.profileScreen,
+                  AppRoutes.searchScreen,
+                  //AppRoutes.otherMainPage
+                ].contains(currentRouteName)) {
+                  return PageRouteBuilder(
+                    pageBuilder: (ctx, ani, ani1) =>
+                        getCurrentPage(currentRouteName, ctx),
+                    transitionDuration: const Duration(seconds: 0),
+                  );
+                }
+
+                // For all other routes, use the default MaterialPageRoute
+                return MaterialPageRoute(
+                  builder: (context) {
+                    final WidgetBuilder? builder =
+                        AppRoutes.routes[currentRouteName];
+                    if (builder != null) {
+                      return builder(context);
+                    } else {
+                      return const Center(child: Text('Route not found'));
+                    }
+                  },
                 );
               },
             ),
           ),
-
-          // Your Bottom Navigation Bar
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: CustomBottomBar(onChanged: (BottomBarEnum type) {
               final String currentRouteName = getCurrentRoute(type);
-              Navigator.pushNamed(
-                  navigatorKey.currentContext!, currentRouteName);
+              if (navigatorKey.currentContext != null) {
+                Navigator.pushNamed(
+                  navigatorKey.currentContext!,
+                  currentRouteName,
+                );
+              }
             }),
           ),
         ],
@@ -74,7 +96,6 @@ class _ScreensContainerState extends State<ScreensContainer> {
     if (builder != null) {
       return builder(context);
     } else {
-      // Handle case where the route is not found
       return const Center(child: Text('Route not found'));
     }
   }

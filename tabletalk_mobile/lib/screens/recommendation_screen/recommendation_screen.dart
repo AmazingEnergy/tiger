@@ -1,13 +1,16 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:tabletalk_mobile/data/recipe_result_data.dart';
 import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/recipe_search_result.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_search_result.dart';
 import 'package:tabletalk_mobile/routes/app_routes.dart';
+import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
+import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/recipe_box.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/restaurant_box.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/search_box.dart';
@@ -69,8 +72,14 @@ class _RecommendScreenState extends State<RecommendScreen> {
         }
 
         try {
+          final location =
+              // ignore: use_build_context_synchronously
+              Provider.of<LocationProvider>(context, listen: false)
+                  .currentLocation;
+          double latitude = location?.latitude as double;
+          double longtitude = location?.longitude as double;
           restaurants = await restaurantSearchService
-              .fetchRestaurantSearchResults(searchId);
+              .fetchRestaurantSearchResults(searchId, latitude, longtitude);
         } catch (restaurantError) {
           print('Error fetching restaurant: $restaurantError');
         }
@@ -227,10 +236,13 @@ class _RecommendScreenState extends State<RecommendScreen> {
     RecipeDetail recipeDetail = await getRecipeDetails(context, recipeId);
 
     // ignore: use_build_context_synchronously
-    Navigator.pushNamed(
+    await Navigator.push(
       context,
-      AppRoutes.recipeDetailScreen,
-      arguments: recipeDetail,
+      MaterialPageRoute(
+        builder: (context) => RecipeDetailScreen(
+          recipeDetail: recipeDetail,
+        ),
+      ),
     );
   }
 
@@ -261,10 +273,13 @@ class _RecommendScreenState extends State<RecommendScreen> {
         await getRestaurantDetails(context, restaurantId);
 
     // ignore: use_build_context_synchronously
-    Navigator.pushNamed(
+    await Navigator.push(
       context,
-      AppRoutes.restaurantDetailScreen,
-      arguments: restaurantDetail,
+      MaterialPageRoute(
+        builder: (context) => RestaurantDetailScreen(
+          restaurantDetail: restaurantDetail,
+        ),
+      ),
     );
   }
 }

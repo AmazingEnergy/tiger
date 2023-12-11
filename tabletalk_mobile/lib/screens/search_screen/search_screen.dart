@@ -3,13 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/search_id.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/recommendation_screen.dart';
 import 'package:tabletalk_mobile/services/search_id_data_service.dart';
-import 'package:tabletalk_mobile/widgets/custom_bottom_bar.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({super.key});
+  const SearchScreen({super.key});
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -133,9 +133,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> _submitSearch(BuildContext context, String searchText) async {
-    // Close the keyboard
     FocusManager.instance.primaryFocus?.unfocus();
-
     setState(() {
       loading = true;
     });
@@ -144,13 +142,14 @@ class _SearchScreenState extends State<SearchScreen> {
       String searchId = await getSearchId(context, searchText);
 
       // ignore: use_build_context_synchronously
-      Navigator.pushNamed(
+      await Navigator.push(
         context,
-        AppRoutes.recommendationScreen,
-        arguments: {
-          'searchText': searchText,
-          'searchId': searchId,
-        },
+        MaterialPageRoute(
+          builder: (context) => RecommendScreen(
+            searchText: searchText,
+            searchId: searchId,
+          ),
+        ),
       );
     } finally {
       setState(() {

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:auth0_flutter/auth0_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/theme/theme_helper.dart';
 import 'package:tabletalk_mobile/routes/app_routes.dart';
 import 'package:location/location.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,11 +42,9 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> loadCredentials() async {
     bool isLoggedIn = await _auth0.credentialsManager.hasValidCredentials();
-    print(isLoggedIn);
     if (isLoggedIn) {
       _credentials = await _auth0.credentialsManager.credentials();
       notifyListeners();
-      print(_credentials?.accessToken);
     } else {
       logoutAction();
     }
@@ -58,10 +56,7 @@ class AuthProvider with ChangeNotifier {
           .webAuthentication(scheme: "tabletalk")
           .login(audience: "https://api.amzegy.com/core/");
       _credentials = credentials;
-      print("accessToken");
-      print(_credentials?.accessToken);
       await _auth0.credentialsManager.storeCredentials(credentials);
-
       notifyListeners();
     } catch (e, s) {
       logoutAction();
@@ -72,6 +67,8 @@ class AuthProvider with ChangeNotifier {
   Future<void> logoutAction() async {
     await _auth0.webAuthentication(scheme: "tabletalk").logout();
     _credentials = null;
+    //final cookieManager = WebviewCookieManager();
+    //cookieManager.clearCookies;
     notifyListeners();
   }
 }
