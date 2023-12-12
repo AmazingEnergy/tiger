@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
-import 'package:tabletalk_mobile/screens/detail_screen/recipe_ingredients.dart';
-import 'package:tabletalk_mobile/screens/detail_screen/recipe_instructions.dart';
+import 'package:tabletalk_mobile/screens/detail_screen/widgets/recipe_ingredients.dart';
+import 'package:tabletalk_mobile/screens/detail_screen/widgets/recipe_instructions.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final RecipeDetail recipeDetail;

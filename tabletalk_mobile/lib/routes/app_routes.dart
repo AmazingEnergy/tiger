@@ -3,6 +3,7 @@ import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
+import 'package:tabletalk_mobile/screens/history_screen/history_screen.dart';
 import 'package:tabletalk_mobile/screens/profile_screen/profile_screen.dart';
 import 'package:tabletalk_mobile/screens/screens_container/screens_container.dart';
 import 'package:tabletalk_mobile/screens/start_screen/start_screen.dart';
@@ -17,6 +18,7 @@ class AppRoutes {
   static const String recipeDetailScreen = '/recipe_detail_screen';
   static const String restaurantDetailScreen = '/restaurant_detail_screen';
   static const String profileScreen = '/profile_screen';
+  static const String historyScreen = '/history_screen';
 
   static Map<String, WidgetBuilder> routes = {
     startScreen: (context) => const StartScreen(),
@@ -25,16 +27,12 @@ class AppRoutes {
     recipeDetailScreen: (context) {
       final RecipeDetail recipeDetail =
           ModalRoute.of(context)!.settings.arguments as RecipeDetail;
-      return RecipeDetailScreen(
-        recipeDetail: recipeDetail
-      );
+      return RecipeDetailScreen(recipeDetail: recipeDetail);
     },
     restaurantDetailScreen: (context) {
       final RestaurantDetail restaurantDetail =
           ModalRoute.of(context)!.settings.arguments as RestaurantDetail;
-      return RestaurantDetailScreen(
-        restaurantDetail: restaurantDetail
-      );
+      return RestaurantDetailScreen(restaurantDetail: restaurantDetail);
     },
     recommendationScreen: (context) {
       final Map<String, dynamic> args =
@@ -47,5 +45,6 @@ class AppRoutes {
       );
     },
     profileScreen: (context) => const ProfileScreen(),
+    historyScreen: (context) => const HistoryScreen(),
   };
 }
