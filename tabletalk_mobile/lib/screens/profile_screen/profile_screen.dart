@@ -217,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSubscribeButton() {
     return GestureDetector(
       onTap: () {
-        // Add button logic for subscription
+        // Add logic for subscription
       },
       child: Container(
         width: double.infinity,
@@ -253,8 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _saveProfileChanges(BuildContext context) {
-    // Add logic to save changes
-    // This is where you will handle the saving of the updated profile information.
+    // Add logic to save
     // Update the UserProfile model with the new values from the text fields.
     // call API update
     // After saving disable editing again.
