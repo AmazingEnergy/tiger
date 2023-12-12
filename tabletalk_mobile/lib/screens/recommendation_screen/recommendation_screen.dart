@@ -97,17 +97,18 @@ class _RecommendScreenState extends State<RecommendScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
-              SearchBox(defaultText: widget.searchText),
               const SizedBox(height: 10),
+              SearchBox(defaultText: widget.searchText),
+              const SizedBox(height: 10), // Adjust this spacing if needed
               Expanded(
                 child: DefaultTabController(
                   length: 2,
                   child: Column(
                     children: <Widget>[
-                      const TabBar(
+                      TabBar(
                         indicatorWeight: 3.0,
                         labelStyle: TextStyle(
                           fontSize: 16,

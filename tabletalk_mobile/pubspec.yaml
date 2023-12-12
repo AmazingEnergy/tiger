@@ -49,6 +49,8 @@ dependencies:
   location: ^5.0.3
   fluttertoast: ^8.2.4
   webview_cookie_manager: ^2.0.6
+  flutter_screenutil: ^5.9.0
+  image_picker: ^1.0.4
 
 dev_dependencies:
   flutter_launcher_icons: ^0.9.2

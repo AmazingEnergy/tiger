@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tabletalk_mobile/data/profile_data.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
@@ -25,16 +26,12 @@ class AppRoutes {
     recipeDetailScreen: (context) {
       final RecipeDetail recipeDetail =
           ModalRoute.of(context)!.settings.arguments as RecipeDetail;
-      return RecipeDetailScreen(
-        recipeDetail: recipeDetail
-      );
+      return RecipeDetailScreen(recipeDetail: recipeDetail);
     },
     restaurantDetailScreen: (context) {
       final RestaurantDetail restaurantDetail =
           ModalRoute.of(context)!.settings.arguments as RestaurantDetail;
-      return RestaurantDetailScreen(
-        restaurantDetail: restaurantDetail
-      );
+      return RestaurantDetailScreen(restaurantDetail: restaurantDetail);
     },
     recommendationScreen: (context) {
       final Map<String, dynamic> args =
@@ -46,6 +43,6 @@ class AppRoutes {
         searchId: searchId,
       );
     },
-    profileScreen: (context) => const ProfileScreen(),
+    profileScreen: (context) => ProfileScreen(userProfile: userProfileData),
   };
 }
