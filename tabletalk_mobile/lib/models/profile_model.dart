@@ -1,6 +1,7 @@
 class UserProfile {
   String id;
   String imageUrl;
+  String email;
   String fullName;
   String address;
   String nationality;
@@ -8,11 +9,11 @@ class UserProfile {
   String favoriteMeals;
   String hateMeals;
   int eatingHabit;
-  String email;
 
   UserProfile({
     required this.id,
     required this.imageUrl,
+    required this.email,
     required this.fullName,
     required this.address,
     required this.nationality,
@@ -20,7 +21,6 @@ class UserProfile {
     required this.favoriteMeals,
     required this.hateMeals,
     required this.eatingHabit,
-    required this.email,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
