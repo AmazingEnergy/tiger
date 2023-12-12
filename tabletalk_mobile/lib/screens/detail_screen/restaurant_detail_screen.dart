@@ -118,23 +118,34 @@ class RestaurantDetailScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.v),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        color: Color(0XFFFFAD30),
-                        size: 16,
-                      ),
-                      SizedBox(width: 4.h),
-                      Text(
-                        restaurant.rating.toString(),
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
+                  Container(
+                    width: 60,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFFFFE1B3),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0,
+                      vertical: 2.0,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Color(0XFFFFAD30),
+                          size: 16,
+                        ),
+                        SizedBox(width: 4.h),
+                        Text(
+                          restaurant.rating.toString(),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 8.v),
                   Text("Food restaurant", style: theme.textTheme.bodyMedium),
