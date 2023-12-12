@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tabletalk_mobile/data/profile_data.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
@@ -44,7 +45,6 @@ class AppRoutes {
         searchId: searchId,
       );
     },
-    profileScreen: (context) => const ProfileScreen(),
-    historyScreen: (context) => const HistoryScreen(),
+    profileScreen: (context) => ProfileScreen(userProfile: userProfileData),
   };
 }
