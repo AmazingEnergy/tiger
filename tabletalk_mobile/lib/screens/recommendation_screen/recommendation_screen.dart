@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/recipe_search_result.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_search_result.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/providers/location_provider.dart';
 import 'package:tabletalk_mobile/routes/app_routes.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
@@ -108,7 +109,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
                   length: 2,
                   child: Column(
                     children: <Widget>[
-                      TabBar(
+                      const TabBar(
                         indicatorWeight: 3.0,
                         labelStyle: TextStyle(
                           fontSize: 16,

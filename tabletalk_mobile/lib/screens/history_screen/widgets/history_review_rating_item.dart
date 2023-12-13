@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:tabletalk_mobile/main.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/widgets/custom_rating_bar.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/simple_rating_model.dart';
@@ -101,7 +101,7 @@ class HistoryReviewRatingItem extends StatelessWidget {
                   final authProvider =
                       Provider.of<AuthProvider>(context, listen: false);
                   if (authProvider.credentials == null) {
-                    authProvider.loginAction();
+                    authProvider.loginAction(context);
                     return;
                   }
                   final String accessToken =

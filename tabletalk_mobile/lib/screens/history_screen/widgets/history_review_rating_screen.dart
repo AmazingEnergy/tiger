@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/utils/size_utils.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/theme/app_decoration.dart';
 import 'package:tabletalk_mobile/theme/theme_helper.dart';
 import 'package:tabletalk_mobile/models/simple_rating_model.dart';
 import 'package:tabletalk_mobile/screens/history_screen/widgets/history_review_rating_item.dart';
 import 'package:tabletalk_mobile/services/review_rating_service.dart';
 import 'package:provider/provider.dart';
-import 'package:tabletalk_mobile/main.dart'; // Import the AuthProvider
 
 class HistoryReviewRatingScreen extends StatefulWidget {
   late List<SimpleRatingModel> ratings;

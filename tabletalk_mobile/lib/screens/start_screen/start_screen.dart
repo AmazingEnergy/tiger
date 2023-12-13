@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/main.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 
 class StartScreen extends StatefulWidget {
@@ -135,7 +135,7 @@ class _StartScreenState extends State<StartScreen> {
 
   void onTapLogin(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.loginAction();
+    await authProvider.loginAction(context);
   }
 
   void goToSearchPage(BuildContext context) async {

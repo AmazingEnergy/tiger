@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/search_history_model.dart';
 import 'package:tabletalk_mobile/models/search_id_model.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/services/search_id_data_service.dart';
 
 class HistorySearchItem extends StatelessWidget {
@@ -22,7 +22,7 @@ class HistorySearchItem extends StatelessWidget {
           final authProvider =
               Provider.of<AuthProvider>(context, listen: false);
           if (authProvider.credentials == null) {
-            authProvider.loginAction();
+            authProvider.loginAction(context);
           }
           final String accessToken = authProvider.credentials!.accessToken;
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/search_history_model.dart';
 import 'package:tabletalk_mobile/models/simple_rating_model.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/screens/history_screen/widgets/history_review_rating_screen.dart';
 import 'package:tabletalk_mobile/screens/history_screen/widgets/history_search_screen.dart';
 import 'package:tabletalk_mobile/services/history_data_service.dart';
@@ -27,7 +27,7 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
     tabviewController = TabController(length: 2, vsync: this);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.credentials == null) {
-      authProvider.loginAction();
+      authProvider.loginAction(context);
     }
     final String accessToken = authProvider.credentials!.accessToken;
     historyDataService = HistoryDataService(accessToken: accessToken);
