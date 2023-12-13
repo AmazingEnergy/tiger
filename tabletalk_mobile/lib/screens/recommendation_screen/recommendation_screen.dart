@@ -12,6 +12,7 @@ import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/recipe_box.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/restaurant_box.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/search_box.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/like_dislike_buttons.dart';
 import 'package:tabletalk_mobile/services/recipe_data_service.dart';
 import 'package:tabletalk_mobile/services/recipe_result_data_service.dart';
 import 'package:tabletalk_mobile/services/restaurant_data_serivce.dart';
@@ -22,7 +23,8 @@ class RecommendScreen extends StatefulWidget {
   final String searchId;
 
   const RecommendScreen(
-      {super.key, required this.searchText, required this.searchId});
+      {Key? key, required this.searchText, required this.searchId})
+      : super(key: key);
 
   @override
   State<RecommendScreen> createState() => _RecommendScreenState();
@@ -33,10 +35,13 @@ class _RecommendScreenState extends State<RecommendScreen> {
   List<RecipeSearchResult> recipes = List.empty(growable: true);
   List<RestaurantSearchResult> restaurants = List.empty(growable: true);
 
+  double buttonPositionX = 0;
+  double buttonPositionY = 0;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(_afterPageRender);
+    WidgetsBinding.instance?.addPostFrameCallback(_afterPageRender);
   }
 
   _afterPageRender(_) {
@@ -92,58 +97,106 @@ class _RecommendScreenState extends State<RecommendScreen> {
     }
   }
 
+  // Add constraints to keep the button within the screen bounds
+  void updateButtonPosition(double dx, double dy) {
+    final maxX = MediaQuery.of(context).size.width - 56;
+    final maxY = MediaQuery.of(context).size.height - 56;
+
+    setState(() {
+      buttonPositionX = dx.clamp(0.0, maxX);
+      buttonPositionY = dy.clamp(0.0, maxY);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              SearchBox(defaultText: widget.searchText),
-              const SizedBox(height: 10), // Adjust this spacing if needed
-              Expanded(
-                child: DefaultTabController(
-                  length: 2,
-                  child: Column(
-                    children: <Widget>[
-                      TabBar(
-                        indicatorWeight: 3.0,
-                        labelStyle: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                        ),
-                        tabs: [
-                          Tab(
-                            child: Text("Recipes"),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  SearchBox(defaultText: widget.searchText),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: <Widget>[
+                          const TabBar(
+                            indicatorWeight: 3.0,
+                            labelStyle: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                            ),
+                            tabs: [
+                              Tab(
+                                child: Text("Recipes"),
+                              ),
+                              Tab(
+                                child: Text("Restaurant"),
+                              ),
+                            ],
                           ),
-                          Tab(
-                            child: Text("Restaurant"),
+                          Expanded(
+                            child: TabBarView(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: _buildListRecipe(),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: _buildListRestaurant(),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: _buildListRecipe(),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: _buildListRestaurant(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: buttonPositionY,
+              right: buttonPositionX,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Draggable(
+                  childWhenDragging: Container(),
+                  feedback: LikeDislikeButtons(
+                    onLike: () {
+                      print('Liked');
+                    },
+                    onDislike: () {
+                      print('Disliked');
+                    },
+                  ),
+                  onDragEnd: (dragDetails) {
+                    // Update the position of the buttons within constraints
+                    updateButtonPosition(
+                      dragDetails.offset.dx,
+                      dragDetails.offset.dy,
+                    );
+                  },
+                  child: LikeDislikeButtons(
+                    onLike: () {
+                      print('Liked');
+                    },
+                    onDislike: () {
+                      print('Disliked');
+                    },
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -200,14 +253,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
         ),
       ),
     );
-  }
-
-  void startColorChangingAnimation() {
-    Future.delayed(Duration(milliseconds: 500), () {
-      setState(() {
-        // Add your color changing animation logic here if needed
-      });
-    });
   }
 
   Future<RecipeDetail> getRecipeDetails(
@@ -280,38 +325,4 @@ class _RecommendScreenState extends State<RecommendScreen> {
       ),
     );
   }
-}
-
-Future<RestaurantDetail> getRestaurantDetails(
-    BuildContext context, String restaurantId) async {
-  final capturedContext = context;
-  RestaurantDetail restaurantDetail;
-  final authProvider =
-      Provider.of<AuthProvider>(capturedContext, listen: false);
-  if (authProvider.credentials != null) {
-    final String accessToken = authProvider.credentials!.accessToken;
-
-    RestaurantDataService restaurantDataService =
-        RestaurantDataService(accessToken: accessToken);
-
-    restaurantDetail =
-        await restaurantDataService.fetchRestaurantDetails(restaurantId);
-  } else {
-    throw Exception('Failed to load data');
-  }
-
-  return restaurantDetail;
-}
-
-void goToRestaurantDetailScreen(
-    BuildContext context, String restaurantId) async {
-  RestaurantDetail restaurantDetail =
-      await getRestaurantDetails(context, restaurantId);
-
-  // ignore: use_build_context_synchronously
-  Navigator.pushNamed(
-    context,
-    AppRoutes.restaurantDetailScreen,
-    arguments: restaurantDetail,
-  );
 }
