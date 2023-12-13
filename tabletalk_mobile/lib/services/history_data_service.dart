@@ -1,31 +1,32 @@
 import 'package:http/http.dart' as http;
-import 'package:tabletalk_mobile/models/search_id_model.dart';
 import 'dart:convert';
+import 'package:tabletalk_mobile/models/search_history_model.dart';
 
 class HistoryDataService {
   final String accessToken;
 
   HistoryDataService({required this.accessToken});
 
-  Future<SearchIdModel> fetchSearchIdModels(String searchText) async {
-    final response = await http.post(
-      Uri.parse('https://api.amzegy.com/core/api/v1/search'),
+  Future<List<SearchHistoryModel>> fetchSearchHistoryData() async {
+    final response = await http.get(
+      Uri.parse('https://api.amzegy.com/core/api/v1/search/history'),
       headers: {
         "Authorization": "Bearer $accessToken",
-        "Content-Type": "application/json",
       },
-      body: jsonEncode({"searchText": searchText}),
     );
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
+      List<dynamic> items = jsonData['items'];
 
-      SearchIdModel searchIdModel = SearchIdModel.fromJson(jsonData);
+      List<SearchHistoryModel> searchHistory = items
+          .map((jsonItem) => SearchHistoryModel.fromJson(jsonItem))
+          .toList();
 
-      return searchIdModel;
+      return searchHistory;
     } else {
       throw Exception(
-          'Failed to load data. Error code: ${response.statusCode}');
+          'Failed to load search history. Error code: ${response.statusCode}');
     }
   }
 }

@@ -22,6 +22,7 @@ class HistorySearchScreenState extends State<HistorySearchScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    var mediaQueryData = MediaQuery.of(context);
 
     return SafeArea(
       child: Scaffold(

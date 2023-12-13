@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/screens/history_screen/widgets/history_search_item.dart';
+import 'package:tabletalk_mobile/main.dart';
+import 'package:tabletalk_mobile/models/search_history_model.dart';
+import 'package:tabletalk_mobile/models/simple_rating_model.dart';
+import 'package:tabletalk_mobile/screens/history_screen/widgets/history_review_rating_screen.dart';
 import 'package:tabletalk_mobile/screens/history_screen/widgets/history_search_screen.dart';
+import 'package:tabletalk_mobile/services/history_data_service.dart';
+import 'package:tabletalk_mobile/services/review_rating_service.dart';
 
-// ignore_for_file: must_be_immutable
 class HistoryScreenContainer extends StatefulWidget {
   const HistoryScreenContainer({super.key});
 
@@ -14,16 +19,23 @@ class HistoryScreenContainer extends StatefulWidget {
 class HistoryScreenContainerState extends State<HistoryScreenContainer>
     with TickerProviderStateMixin {
   late TabController tabviewController;
+  late HistoryDataService historyDataService;
 
   @override
   void initState() {
     super.initState();
     tabviewController = TabController(length: 2, vsync: this);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.credentials == null) {
+      authProvider.loginAction();
+    }
+    final String accessToken = authProvider.credentials!.accessToken;
+    historyDataService = HistoryDataService(accessToken: accessToken);
   }
 
   @override
   Widget build(BuildContext context) {
-    mediaQueryData = MediaQuery.of(context);
+    var mediaQueryData = MediaQuery.of(context);
 
     return SafeArea(
       child: Scaffold(
@@ -46,9 +58,9 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
                 child: SizedBox(
                   child: TabBarView(
                     controller: tabviewController,
-                    children: const [
-                      HistorySearchScreen(searchHistory: [],)
-                      //HistorySearchScreen(),
+                    children: [
+                      _buildHistorySearchScreen(),
+                      _buildReviewRatingScreen(),
                     ],
                   ),
                 ),
@@ -60,7 +72,45 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
     );
   }
 
-  /// Section Widget
+  Widget _buildHistorySearchScreen() {
+    return FutureBuilder<List<SearchHistoryModel>>(
+      future: historyDataService.fetchSearchHistoryData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          return HistorySearchScreen(searchHistory: snapshot.data!);
+        } else {
+          return const Center(child: Text('No search history found'));
+        }
+      },
+    );
+  }
+
+  Widget _buildReviewRatingScreen() {
+    final ReviewRatingService reviewRatingService = ReviewRatingService(
+        accessToken: Provider.of<AuthProvider>(context, listen: false)
+            .credentials!
+            .accessToken);
+
+    return FutureBuilder<List<SimpleRatingModel>>(
+      future: reviewRatingService.fetchReviewRatings(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          return HistoryReviewRatingScreen(ratings: snapshot.data!);
+        } else {
+          return const Center(child: Text('No reviews and ratings found'));
+        }
+      },
+    );
+  }
+
   Widget _buildTabview(BuildContext context) {
     return Container(
       height: 50.v,
@@ -96,14 +146,10 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
           ),
           tabs: const [
             Tab(
-              child: Text(
-                "Search",
-              ),
+              child: Text("Search"),
             ),
             Tab(
-              child: Text(
-                "Reviews and ratings",
-              ),
+              child: Text("Reviews and ratings"),
             ),
           ],
         ),

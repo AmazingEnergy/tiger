@@ -139,6 +139,9 @@ class PrimaryColors {
 
   // White
   Color get whiteA700 => const Color(0XFFFFFFFF);
+
+  // Amber
+  Color get amberA700 => const Color(0XFFE4A709);
 }
 
 PrimaryColors get appTheme => ThemeHelper().themeColor();
