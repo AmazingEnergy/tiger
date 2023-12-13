@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
+import 'package:tabletalk_mobile/screens/history_screen/widgets/history_search_item.dart';
+import 'package:tabletalk_mobile/screens/history_screen/widgets/history_search_screen.dart';
 
 // ignore_for_file: must_be_immutable
-class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+class HistoryScreenContainer extends StatefulWidget {
+  const HistoryScreenContainer({super.key});
 
   @override
-  HistoryScreenState createState() => HistoryScreenState();
+  HistoryScreenContainerState createState() => HistoryScreenContainerState();
 }
 
-class HistoryScreenState extends State<HistoryScreen>
+class HistoryScreenContainerState extends State<HistoryScreenContainer>
     with TickerProviderStateMixin {
   late TabController tabviewController;
 
@@ -40,14 +42,15 @@ class HistoryScreenState extends State<HistoryScreen>
               ),
               SizedBox(height: 29.v),
               _buildTabview(context),
-              SizedBox(
-                height: 471.v,
-                child: TabBarView(
-                  controller: tabviewController,
-                  children: [
-                    //HistoryScreenSearchPage(),
-                    //HistoryScreenSearchPage(),
-                  ],
+              Expanded(
+                child: SizedBox(
+                  child: TabBarView(
+                    controller: tabviewController,
+                    children: const [
+                      HistorySearchScreen(searchHistory: [],)
+                      //HistorySearchScreen(),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -76,13 +79,13 @@ class HistoryScreenState extends State<HistoryScreen>
           labelPadding: EdgeInsets.zero,
           labelColor: appTheme.gray100,
           labelStyle: TextStyle(
-            fontSize: 12.fSize,
+            fontSize: 13.fSize,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w500,
           ),
           unselectedLabelColor: appTheme.gray700,
           unselectedLabelStyle: TextStyle(
-            fontSize: 12.fSize,
+            fontSize: 13.fSize,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w500,
           ),

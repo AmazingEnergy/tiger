@@ -3,7 +3,7 @@ import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/widgets/custom_bottom_bar.dart';
 
 class ScreensContainer extends StatefulWidget {
-  ScreensContainer({Key? key}) : super(key: key);
+  const ScreensContainer({super.key});
 
   @override
   _ScreensContainerState createState() => _ScreensContainerState();
@@ -36,7 +36,7 @@ class _ScreensContainerState extends State<ScreensContainer> {
                         if ([
                           AppRoutes.profileScreen,
                           AppRoutes.searchScreen,
-                          //AppRoutes.otherMainPage
+                          AppRoutes.historyScreen
                         ].contains(currentRouteName)) {
                           return PageRouteBuilder(
                             pageBuilder: (ctx, ani, ani1) =>
@@ -81,7 +81,7 @@ class _ScreensContainerState extends State<ScreensContainer> {
   String getCurrentRoute(BottomBarEnum type) {
     switch (type) {
       case BottomBarEnum.Clock:
-        return AppRoutes.profileScreen;
+        return AppRoutes.historyScreen;
       case BottomBarEnum.toolbarsearch:
         return AppRoutes.searchScreen;
       case BottomBarEnum.User:

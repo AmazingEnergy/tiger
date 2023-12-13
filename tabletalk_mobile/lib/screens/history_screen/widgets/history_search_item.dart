@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
+import 'package:tabletalk_mobile/models/search_history_model.dart';
 
-// ignore: must_be_immutable
-class FeedlistItemWidget extends StatelessWidget {
-  const FeedlistItemWidget({super.key});
+class HistorySearchItem extends StatelessWidget {
+  final SearchHistoryModel searchHistoryModel;
+
+  const HistorySearchItem({super.key, required this.searchHistoryModel});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class FeedlistItemWidget extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(top: 7.v),
                   child: Text(
-                    dateTimeConverter("2023-12-12T06:48:34.000Z"), // time
+                    dateTimeConverter(searchHistoryModel.time),
                     style: CustomTextStyles.labelLargeGray800,
                   ),
                 ),
@@ -31,12 +33,9 @@ class FeedlistItemWidget extends StatelessWidget {
           SizedBox(height: 11.v),
           Container(
             width: 305.h,
-            margin: EdgeInsets.only(
-              left: 6.h,
-              right: 36.h,
-            ),
+            margin: EdgeInsets.only(left: 6.h, right: 36.h),
             child: Text(
-              "Lately, I’ve been feeling very sad and stress. I would like to find something that could make me happy", // search text
+              searchHistoryModel.searchText,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall,
@@ -50,10 +49,8 @@ class FeedlistItemWidget extends StatelessWidget {
 
   String dateTimeConverter(String str) {
     DateTime dateTime = DateTime.parse(str);
-
     String formattedDateString =
-        DateFormat("yyyy/MM/dd hh:mma").format(dateTime);
-
+        DateFormat("yyyy/MM/dd  -  hh:mma").format(dateTime);
     return formattedDateString;
   }
 }

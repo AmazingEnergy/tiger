@@ -2,10 +2,10 @@ import 'package:http/http.dart' as http;
 import 'package:tabletalk_mobile/models/search_id_model.dart';
 import 'dart:convert';
 
-class SearchIdDataService {
+class HistoryDataService {
   final String accessToken;
 
-  SearchIdDataService({required this.accessToken});
+  HistoryDataService({required this.accessToken});
 
   Future<SearchIdModel> fetchSearchIdModels(String searchText) async {
     final response = await http.post(
