@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
+import 'package:tabletalk_mobile/models/profile_model.dart';
 import 'package:tabletalk_mobile/models/search_history_model.dart';
 import 'package:tabletalk_mobile/models/simple_rating_model.dart';
 import 'package:tabletalk_mobile/providers/auth_provider.dart';
@@ -8,6 +10,7 @@ import 'package:tabletalk_mobile/screens/history_screen/widgets/history_review_r
 import 'package:tabletalk_mobile/screens/history_screen/widgets/history_search_screen.dart';
 import 'package:tabletalk_mobile/services/history_data_service.dart';
 import 'package:tabletalk_mobile/services/review_rating_service.dart';
+import 'package:tabletalk_mobile/services/user_profile_service.dart';
 
 class HistoryScreenContainer extends StatefulWidget {
   const HistoryScreenContainer({super.key});
@@ -20,17 +23,35 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
     with TickerProviderStateMixin {
   late TabController tabviewController;
   late HistoryDataService historyDataService;
+  bool isProMember = false;
 
   @override
   void initState() {
     super.initState();
     tabviewController = TabController(length: 2, vsync: this);
+    _loadUserProfileAndInitServices();
+  }
+
+  Future<void> _loadUserProfileAndInitServices() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.credentials == null) {
-      authProvider.loginAction(context);
+      await authProvider.loginAction(context);
     }
     final String accessToken = authProvider.credentials!.accessToken;
+
+    UserProfileService userProfileService =
+        UserProfileService(accessToken: accessToken);
+    try {
+      UserProfile userProfile = await userProfileService.getProfile();
+      isProMember = userProfile.membership == "pro";
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching user profile: $e');
+      }
+    }
+
     historyDataService = HistoryDataService(accessToken: accessToken);
+    setState(() {});
   }
 
   @override
@@ -73,6 +94,15 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
   }
 
   Widget _buildHistorySearchScreen() {
+    if (!isProMember) {
+      return const Center(
+        child: Text(
+          "Subscribe to the Membership program to view search history",
+          style: TextStyle(
+              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
     return FutureBuilder<List<SearchHistoryModel>>(
       future: historyDataService.fetchSearchHistoryData(),
       builder: (context, snapshot) {
