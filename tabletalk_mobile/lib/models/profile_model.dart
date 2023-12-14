@@ -1,42 +1,53 @@
 class UserProfile {
   String id;
-  String imageUrl;
-  String email;
+  String accountId;
   String fullName;
+  String email;
+  String phone;
   String address;
   String nationality;
+  String country;
   String bio;
   String favoriteMeals;
   String hateMeals;
-  int eatingHabit;
+  String eatingHabits;
+  String membership;
+  String searchCount;
 
   UserProfile({
     required this.id,
-    required this.imageUrl,
-    required this.email,
+    required this.accountId,
     required this.fullName,
+    required this.email,
+    required this.phone,
     required this.address,
     required this.nationality,
+    required this.country,
     required this.bio,
     required this.favoriteMeals,
     required this.hateMeals,
-    required this.eatingHabit,
+    required this.eatingHabits,
+    required this.membership,
+    required this.searchCount,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
+    var profile = json['profile'] ?? {};
     return UserProfile(
-      id: json['id'] ?? '',
-      imageUrl: json['imageUrl'] ?? '',
-      fullName: json['fullName'] ?? '',
-      address: json['address'] ?? '',
-      nationality: json['nationality'] ?? '',
-      bio: json['bio'] ?? '',
-      favoriteMeals: json['favoriteMeals'] ?? '',
-      hateMeals: json['hateMeals'] ?? '',
-      eatingHabit: int.tryParse(json['eatingHabit'].toString()) ?? 0,
-      email: json['email'] ?? '',
+      id: profile['id'] ?? '',
+      accountId: profile['accountId'] ?? '',
+      fullName: profile['fullName'] ?? '',
+      email: profile['email'] ?? '',
+      phone: profile['phone'],
+      address: profile['address'],
+      nationality: profile['nationality'] ?? '',
+      country: profile['country'] ?? '',
+      bio: profile['bio'] ?? '',
+      favoriteMeals: profile['favoriteMeals'] ?? '',
+      hateMeals: profile['hateMeals'] ?? '',
+      eatingHabits: profile['eatingHabits'].toString(),
+      membership: profile['membership'] ?? 'normal',
+      searchCount: profile['searchCount'].toString(),
     );
   }
-
-  get imageFile => null;
 }

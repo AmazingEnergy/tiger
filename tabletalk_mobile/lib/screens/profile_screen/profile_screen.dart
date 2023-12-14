@@ -1,17 +1,17 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/profile_model.dart';
 import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/services/user_profile_service.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key, required this.userProfile}) : super(key: key);
-
-  final UserProfile userProfile;
+  const ProfileScreen({super.key});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -19,7 +19,67 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditing = false;
-  XFile? _selectedImage;
+  late UserProfile userProfile;
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _nationalityController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _favoriteMealsController =
+      TextEditingController();
+  final TextEditingController _hateMealsController = TextEditingController();
+  final TextEditingController _eatingHabitsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.credentials == null) {
+        authProvider.loginAction(context);
+      }
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      UserProfileService userProfileService =
+          UserProfileService(accessToken: accessToken);
+      userProfile = await userProfileService.getProfile();
+      _updateTextControllers();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading user profile: $e');
+      }
+    }
+  }
+
+  String getImageFromAuthProvider() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    return authProvider.credentials?.user.pictureUrl.toString() ?? '';
+  }
+
+  void _updateTextControllers() {
+    _fullNameController.text = userProfile.fullName;
+    _addressController.text = userProfile.address;
+    _nationalityController.text = userProfile.nationality;
+    _bioController.text = userProfile.bio;
+    _favoriteMealsController.text = userProfile.favoriteMeals;
+    _hateMealsController.text = userProfile.hateMeals;
+    _eatingHabitsController.text = userProfile.eatingHabits;
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _addressController.dispose();
+    _nationalityController.dispose();
+    _bioController.dispose();
+    _favoriteMealsController.dispose();
+    _hateMealsController.dispose();
+    _eatingHabitsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('My Profile'),
+          backgroundColor: Colors.white,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -49,89 +109,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Profile Image
                     Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (_isEditing) {
-                              _selectProfilePicture(context);
-                            }
-                          },
-                          child: Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: appTheme.blueGray100,
-                                width: 2,
-                              ),
-                              image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: _selectedImage != null
-                                    ? FileImage(File(_selectedImage!.path))
-                                        as ImageProvider<Object>
-                                    : NetworkImage(widget.userProfile.imageUrl),
-                              ),
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: appTheme.blueGray100,
+                              width: 2,
+                            ),
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: NetworkImage(getImageFromAuthProvider()),
                             ),
                           ),
                         ),
-                        if (_isEditing)
-                          Positioned(
-                            bottom: 4,
-                            right: 4,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFFFD637C),
-                              ),
-                              child: IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
-                                onPressed: () {
-                                  _selectProfilePicture(context);
-                                },
-                                splashRadius: 24,
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                padding: const EdgeInsets.all(8),
-                              ),
-                            ),
-                          ),
                       ],
                     ),
-
                     const SizedBox(height: 20),
-
                     // Subscription Button
                     _buildSubscribeButton(),
-
                     const SizedBox(height: 20),
-
                     // Profile Fields
-                    _buildProfileField("Email", widget.userProfile.email),
+                    _buildProfileField("Full Name", _fullNameController),
+                    _buildProfileField("Address", _addressController),
+                    _buildProfileField("Nationality", _nationalityController),
+                    _buildProfileField("Bio", _bioController),
                     _buildProfileField(
-                        "Full Name", widget.userProfile.fullName),
-                    _buildProfileField("Address", widget.userProfile.address),
+                        "Favorite Meals", _favoriteMealsController),
+                    _buildProfileField("Hate Meals", _hateMealsController),
                     _buildProfileField(
-                        "Nationality", widget.userProfile.nationality),
-                    _buildProfileField("Bio", widget.userProfile.bio),
-                    _buildProfileField(
-                        "Favorite Meals", widget.userProfile.favoriteMeals),
-                    _buildProfileField(
-                        "Hate Meals", widget.userProfile.hateMeals),
-                    _buildProfileField("Eating Habit",
-                        widget.userProfile.eatingHabit.toString()),
-
+                        "Eating Habits", _eatingHabitsController),
                     const SizedBox(height: 20),
-
-                    // Third Row: Buttons
+                    // Save/Edit and Logout Buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        // Save/Edit Button
                         CustomElevatedButton(
                           height: 50,
                           width: 100,
@@ -151,8 +167,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             }
                           },
                         ),
-
-                        // Logout Button
                         CustomElevatedButton(
                           height: 50,
                           width: 100,
@@ -180,7 +194,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileField(String label, String value) {
+  String? _validateEatingHabits(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Eating habit cannot be empty';
+    }
+    final number = int.tryParse(value);
+    if (number == null || number < 1 || number > 8) {
+      return 'Enter a number between 1 and 8';
+    }
+    return null;
+  }
+
+  Widget _buildProfileField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -195,7 +220,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 8),
         CustomTextFormField(
-          hintText: value,
+          controller: controller,
+          hintText: controller.text,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           borderDecoration: OutlineInputBorder(
@@ -206,6 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           enabled: _isEditing && label != "Email",
+          validator: label == "Eating Habits" ? _validateEatingHabits : null,
         ),
         const SizedBox(height: 16),
       ],
@@ -250,37 +277,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _saveProfileChanges(BuildContext context) {
-    // Add logic to save
-    // Update the UserProfile model with the new values from the text fields.
-    // call API update
-    // After saving disable editing again.
-    _toggleEditing();
+  void _saveProfileChanges(BuildContext context) async {
+    try {
+      UserProfile updatedProfile = UserProfile(
+        id: userProfile.id,
+        accountId: userProfile.accountId,
+        fullName: _fullNameController.text,
+        email: userProfile.email,
+        phone: userProfile.phone,
+        address: _addressController.text,
+        nationality: _nationalityController.text,
+        country: userProfile.country,
+        bio: _bioController.text,
+        favoriteMeals: _favoriteMealsController.text,
+        hateMeals: _hateMealsController.text,
+        eatingHabits: _eatingHabitsController.text,
+        membership: userProfile.membership,
+        searchCount: userProfile.searchCount,
+      );
+
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.credentials == null) {
+        authProvider.loginAction(context);
+      }
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      UserProfileService userProfileService =
+          UserProfileService(accessToken: accessToken);
+
+      await userProfileService.updateProfile(userProfile.id, updatedProfile);
+
+      // Update local user profile with new data
+      userProfile = updatedProfile;
+      _toggleEditing();
+    } catch (e) {
+      // Handle error
+      print('Error updating user profile: $e');
+    }
   }
 
   void _logout(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.logoutAction();
-
     // ignore: use_build_context_synchronously
     Navigator.pushReplacementNamed(context, AppRoutes.startScreen);
   }
 
-  void _selectProfilePicture(BuildContext context) async {
-    if (_isEditing) {
-      XFile? selectedImage =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-
-      if (selectedImage != null) {
-        setState(() {
-          _selectedImage = selectedImage;
-        });
-      }
-    }
-  }
-
   void _toggleEditing() {
-    // Toggle editing
     setState(() {
       _isEditing = !_isEditing;
     });
