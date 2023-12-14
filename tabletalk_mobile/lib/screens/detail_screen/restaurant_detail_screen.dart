@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
@@ -6,11 +7,19 @@ import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class RestaurantDetailScreen extends StatelessWidget {
+class RestaurantDetailScreen extends StatefulWidget {
   final RestaurantDetail restaurantDetail;
-  RestaurantDetailScreen({required this.restaurantDetail, super.key});
+  RestaurantDetailScreen({required this.restaurantDetail, Key? key})
+      : super(key: key);
 
+  @override
+  _RestaurantDetailScreenState createState() => _RestaurantDetailScreenState();
+}
+
+class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey();
+  double currentRating = 0.0;
+  bool isStarRated = false;
 
   @override
   Widget build(BuildContext context) {
@@ -19,154 +28,150 @@ class RestaurantDetailScreen extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       extendBody: true,
       extendBodyBehindAppBar: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          // Wrap with SingleChildScrollView
-          child: Stack(
-            children: [
-              Container(
-                width: double.maxFinite,
-                padding: EdgeInsets.symmetric(vertical: 35.v),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 6.v),
-                    CustomImageView(
-                      imagePath: ImageConstant.imgArrowLeft,
-                      height: 20.adaptSize,
-                      width: 20.adaptSize,
-                      margin: EdgeInsets.only(left: 30.h),
-                      onTap: () {
-                        onTapImgArrowLeft(context);
-                      },
-                    ),
-                    SizedBox(height: 10.v),
-                    _buildCardSection(context, restaurantDetail),
-                    SizedBox(height: 10.v),
-                    _buildFiveSection(context, restaurantDetail),
-                    SizedBox(height: 25.v),
-                    Container(
-                      width: 295.h,
-                      margin: EdgeInsets.only(left: 30.h, right: 49.h),
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Address:  ",
-                              style: CustomTextStyles.bodyMediumBlack900_1
-                                  .copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            TextSpan(
-                              text: "${restaurantDetail.address}\r",
-                              style: CustomTextStyles.bodyMediumBlack900_1,
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                    SizedBox(height: 25.v),
-                    _buildOneSection(context, restaurantDetail),
-                  ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                _buildCardSection(context, widget.restaurantDetail),
+                Positioned(
+                  top: 16.0,
+                  left: 16.0,
+                  child: _buildBackButton(context),
                 ),
+                Positioned(
+                  top: 16.0,
+                  right: 16.0,
+                  child: _buildRatingBar(),
+                ),
+              ],
+            ),
+            Container(
+              width: double.maxFinite,
+              padding: EdgeInsets.symmetric(vertical: 35.v),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildFiveSection(context, widget.restaurantDetail),
+                  SizedBox(height: 25.v),
+                  Container(
+                    width: 295.h,
+                    margin: EdgeInsets.only(left: 30.h, right: 49.h),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Address:  ",
+                            style:
+                                CustomTextStyles.bodyMediumBlack900_1.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: "${widget.restaurantDetail.address}\r",
+                            style: CustomTextStyles.bodyMediumBlack900_1,
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  SizedBox(height: 25.v),
+                  _buildOneSection(context, widget.restaurantDetail),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildCardSection(BuildContext context, RestaurantDetail restaurant) {
-    return Align(
-      alignment: Alignment.center,
-      child: SizedBox(
-        height: 150.v,
-        width: 315.h,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            CustomImageView(
-              imagePath: getImageUrl(restaurant.imageUrl),
-              height: 400.v,
-              width: 300.h,
-              alignment: Alignment.center,
-            ),
-          ],
+    return Padding(
+      // ignore: prefer_const_constructors
+      padding: EdgeInsets.only(top: 20.0),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: SizedBox(
+          height: 200.v,
+          width: double.infinity,
+          child: CustomImageView(
+            imagePath: getImageUrl(restaurant.imageUrl),
+            height: double.infinity,
+            width: double.infinity,
+            alignment: Alignment.center,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildFiveSection(BuildContext context, RestaurantDetail restaurant) {
-    return Align(
-      alignment: Alignment.center,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 30.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${restaurant.name}",
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 30.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${restaurant.name}",
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
-                  SizedBox(height: 8.v),
-                  Container(
-                    width: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: const Color(0xFFFFE1B3),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6.0,
-                      vertical: 2.0,
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          color: Color(0XFFFFAD30),
-                          size: 16,
-                        ),
-                        SizedBox(width: 4.h),
-                        Text(
-                          restaurant.rating.toString(),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 8.v),
+                Container(
+                  width: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFFFFE1B3),
                   ),
-                  SizedBox(height: 8.v),
-                  Text("Food restaurant", style: theme.textTheme.bodyMedium),
-                ],
-              ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6.0,
+                    vertical: 2.0,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.star,
+                        color: Color(0XFFFFAD30),
+                        size: 16,
+                      ),
+                      SizedBox(width: 4.h),
+                      Text(
+                        restaurant.rating.toString(),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8.v),
+                Text("Food restaurant", style: theme.textTheme.bodyMedium),
+              ],
             ),
-            CustomElevatedButton(
-              height: 33.v,
-              width: 143.h,
-              text: "Visit Website",
-              isDisabled: restaurant.website == '',
-              margin: EdgeInsets.only(left: 13.h, top: 13.v, bottom: 14.v),
-              buttonStyle: CustomButtonStyles.none,
-              decoration: CustomButtonStyles.gradientPinkToPinkADecoration,
-              buttonTextStyle: CustomTextStyles.labelMediumWhiteA700,
-              onPressed: () {
-                launchWebsite(restaurant.website);
-              },
-            ),
-          ],
-        ),
+          ),
+          CustomElevatedButton(
+            height: 33.v,
+            width: 143.h,
+            text: "Visit Website",
+            isDisabled: restaurant.website == '',
+            margin: EdgeInsets.only(left: 13.h, top: 13.v, bottom: 14.v),
+            buttonStyle: CustomButtonStyles.none,
+            decoration: CustomButtonStyles.gradientPinkToPinkADecoration,
+            buttonTextStyle: CustomTextStyles.labelMediumWhiteA700,
+            onPressed: () {
+              launchWebsite(widget.restaurantDetail.website);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -179,25 +184,90 @@ class RestaurantDetailScreen extends StatelessWidget {
         launchGoogleMap(restaurant.address);
       },
       child: SizedBox(
-        height: 300.v,
-        width: double.maxFinite,
+        height: 500.v,
+        width: double.infinity,
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
             Image.network(
               staticMapUrl,
-              height: 295.v,
-              width: 375.h,
+              height: double.infinity,
+              width: double.infinity,
               fit: BoxFit.cover,
             ),
             Align(
               alignment: Alignment.bottomLeft,
               child: Padding(
-                padding: EdgeInsets.only(left: 15.h, bottom: 37.v),
+                padding: EdgeInsets.only(left: 30.h, bottom: 37.v),
                 child: Text("Google", style: theme.textTheme.titleLarge),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRatingBar() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: GestureDetector(
+        onVerticalDragDown: (details) {
+          setState(() {
+            currentRating = 0.0;
+            isStarRated = false;
+          });
+          _saveRating(currentRating);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: RatingBar.builder(
+            initialRating: currentRating,
+            minRating: 0.5,
+            direction: Axis.horizontal,
+            allowHalfRating: true,
+            itemCount: 5,
+            itemSize: 30.0,
+            itemBuilder: (context, _) => Icon(
+              Icons.star,
+              color: isStarRated ? Colors.amber : Colors.grey,
+            ),
+            onRatingUpdate: (rating) {
+              print(rating);
+              setState(() {
+                currentRating = rating;
+                isStarRated = true;
+              });
+              _saveRating(currentRating);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: GestureDetector(
+        onTap: () {
+          onTapImgArrowLeft(context);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8.0),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+          ),
+          child: CustomImageView(
+            imagePath: ImageConstant.imgArrowLeft,
+            height: 20.adaptSize,
+            width: 20.adaptSize,
+          ),
         ),
       ),
     );
@@ -242,5 +312,9 @@ class RestaurantDetailScreen extends StatelessWidget {
 
   void onTapImgArrowLeft(BuildContext context) {
     Navigator.pop(context);
+  }
+
+  void _saveRating(double rating) {
+    // save rating logic
   }
 }
