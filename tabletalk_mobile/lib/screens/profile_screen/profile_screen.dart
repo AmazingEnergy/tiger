@@ -83,6 +83,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isProMember = userProfile.membership == "pro";
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -90,6 +92,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
+          title: const Text(
+            'My Profile',
+            style: TextStyle(
+              color: Color(0xFFFD637C),
+              fontSize: 24,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -99,39 +110,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'My Profile',
-                      style: TextStyle(
-                        color: Color(0xFFFD637C),
-                        fontSize: 24,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    _buildProfileImage(isProMember),
                     const SizedBox(height: 20),
-                    Stack(
-                      alignment: Alignment.bottomRight,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: appTheme.blueGray100,
-                              width: 2,
-                            ),
-                            image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image: NetworkImage(getImageFromAuthProvider()),
-                            ),
-                          ),
-                        ),
+                        if (isProMember) ...[
+                          _buildGradientIcon(),
+                          const SizedBox(width: 4),
+                          _buildProText(),
+                          const SizedBox(width: 4),
+                          _buildGradientIcon(),
+                        ]
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    // Subscription Button
-                    _buildSubscribeButton(),
+                    if (!isProMember) _buildSubscribeButton(),
                     const SizedBox(height: 20),
                     // Profile Fields
                     _buildProfileField("Full Name", _fullNameController),
@@ -148,6 +141,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        if (_isEditing)
+                          CustomElevatedButton(
+                            height: 50,
+                            width: 100,
+                            text: "Cancel",
+                            buttonTextStyle: const TextStyle(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 15,
+                            ),
+                            buttonStyle: CustomButtonStyles.none,
+                            decoration: CustomButtonStyles
+                                .gradientPrimaryToOnPrimaryContainerDecoration,
+                            onPressed: _cancelEdit,
+                          ),
                         CustomElevatedButton(
                           height: 50,
                           width: 100,
@@ -205,6 +212,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return null;
   }
 
+  Widget _buildProfileImage(bool isProMember) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: appTheme.blueGray100,
+              width: 2,
+            ),
+            image: DecorationImage(
+              fit: BoxFit.fill,
+              image: NetworkImage(getImageFromAuthProvider()),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProText() {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color.fromARGB(255, 242, 7, 7),
+          Color.fromARGB(255, 255, 120, 2)
+        ],
+      ).createShader(bounds),
+      child: const Text(
+        'PRO',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGradientIcon() {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color.fromARGB(255, 242, 7, 7),
+          Color.fromARGB(255, 255, 120, 2)
+        ],
+      ).createShader(bounds),
+      child: const Icon(Icons.auto_awesome, color: Colors.white, size: 35),
+    );
+  }
+
   Widget _buildProfileField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +312,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.orange, Colors.red],
+            colors: [
+              Color.fromARGB(255, 242, 7, 7),
+              Color.fromARGB(255, 255, 120, 2)
+            ],
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -326,6 +390,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _toggleEditing() {
     setState(() {
       _isEditing = !_isEditing;
+    });
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      _updateTextControllers();
+      _isEditing = false;
     });
   }
 }
