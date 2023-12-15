@@ -3,14 +3,14 @@ class UserProfile {
   String accountId;
   String fullName;
   String email;
-  String phone;
-  String address;
-  String nationality;
-  String country;
-  String bio;
-  String favoriteMeals;
-  String hateMeals;
-  String eatingHabits;
+  String? phone;
+  String? address;
+  String? nationality;
+  String? country;
+  String? bio;
+  String? favoriteMeals;
+  String? hateMeals;
+  String? eatingHabits;
   String membership;
   String searchCount;
 
@@ -40,12 +40,12 @@ class UserProfile {
       email: profile['email'] ?? '',
       phone: profile['phone'],
       address: profile['address'],
-      nationality: profile['nationality'] ?? '',
-      country: profile['country'] ?? '',
-      bio: profile['bio'] ?? '',
-      favoriteMeals: profile['favoriteMeals'] ?? '',
-      hateMeals: profile['hateMeals'] ?? '',
-      eatingHabits: profile['eatingHabits'].toString(),
+      nationality: profile['nationality'],
+      country: profile['country'],
+      bio: profile['bio'],
+      favoriteMeals: profile['favoriteMeals'],
+      hateMeals: profile['hateMeals'],
+      eatingHabits: profile['eatingHabits'],
       membership: profile['membership'] ?? 'normal',
       searchCount: profile['searchCount'].toString(),
     );

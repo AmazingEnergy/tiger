@@ -139,6 +139,9 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
+/*       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.logoutAction(); */
+
       String searchId = await getSearchId(context, searchText);
       print(searchId);
       // ignore: use_build_context_synchronously
