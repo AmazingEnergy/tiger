@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/profile_model.dart';
-import 'package:tabletalk_mobile/data/profile_data.dart';
-import 'package:tabletalk_mobile/widgets/custom_bottom_bar.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
 

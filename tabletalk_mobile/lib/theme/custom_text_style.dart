@@ -40,6 +40,15 @@ class CustomTextStyles {
   static get titleMediumSemiBold => theme.textTheme.titleMedium!.copyWith(
         fontWeight: FontWeight.w600,
       );
+  static get labelLargeGray100 => theme.textTheme.labelLarge!.copyWith(
+        color: appTheme.gray100,
+      );
+  static get labelLargeGray800 => theme.textTheme.labelLarge!.copyWith(
+        color: appTheme.gray800,
+      );
+  static get labelLargeWhiteA700 => theme.textTheme.labelLarge!.copyWith(
+        color: appTheme.whiteA700,
+      );
 }
 
 extension on TextStyle {

@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:tabletalk_mobile/models/search_id.dart';
+import 'package:tabletalk_mobile/models/search_id_model.dart';
 import 'dart:convert';
 
 class SearchIdDataService {
@@ -7,9 +7,7 @@ class SearchIdDataService {
 
   SearchIdDataService({required this.accessToken});
 
-  Future<SearchId> fetchSearchIds(String searchText) async {
-    print("Search api");
-    print(searchText);
+  Future<SearchIdModel> fetchSearchIdModels(String searchText) async {
     final response = await http.post(
       Uri.parse('https://api.amzegy.com/core/api/v1/search'),
       headers: {
@@ -22,10 +20,25 @@ class SearchIdDataService {
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
 
-      SearchId searchId = SearchId.fromJson(jsonData);
+      SearchIdModel searchIdModel = SearchIdModel.fromJson(jsonData);
 
-      print(searchId.id);
-      return searchId;
+      return searchIdModel;
+    } else {
+      throw Exception(
+          'Failed to load data. Error code: ${response.statusCode}');
+    }
+  }
+
+  Future<SearchIdDetailModel> fetchSearchIdDetail(String id) async {
+    final response = await http.get(
+      Uri.parse('https://api.amzegy.com/core/api/v1/search/$id'),
+      headers: {
+        "Authorization": "Bearer $accessToken",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return SearchIdDetailModel.fromJson(json.decode(response.body));
     } else {
       throw Exception(
           'Failed to load data. Error code: ${response.statusCode}');
