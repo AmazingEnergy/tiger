@@ -1,8 +1,7 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/profile_model.dart';
 import 'package:tabletalk_mobile/providers/auth_provider.dart';
@@ -61,12 +60,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _updateTextControllers() {
     _fullNameController.text = userProfile.fullName;
-    _addressController.text = userProfile.address;
-    _nationalityController.text = userProfile.nationality;
-    _bioController.text = userProfile.bio;
-    _favoriteMealsController.text = userProfile.favoriteMeals;
-    _hateMealsController.text = userProfile.hateMeals;
-    _eatingHabitsController.text = userProfile.eatingHabits;
+    _addressController.text = userProfile.address ?? '';
+    _nationalityController.text = userProfile.nationality ?? '';
+    _bioController.text = userProfile.bio ?? '';
+    _favoriteMealsController.text = userProfile.favoriteMeals ?? '';
+    _hateMealsController.text = userProfile.hateMeals ?? '';
+    _eatingHabitsController.text = userProfile.eatingHabits ?? '';
   }
 
   @override
@@ -83,6 +82,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _simulateDelay(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildShimmerEffect();
+        } else {
+          return _buildProfileScreen();
+        }
+      },
+    );
+  }
+
+  Widget _buildProfileScreen() {
     bool isProMember = userProfile.membership == "pro";
 
     return GestureDetector(
@@ -195,6 +207,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _simulateDelay() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+  }
+
+  Widget _buildShimmerEffect() {
+    return Scaffold(
+      body: Center(
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const CircleAvatar(
+                radius: 60,
+                backgroundColor: Colors.white,
+              ),
+              const SizedBox(height: 20),
+              Container(
+                height: 20,
+                width: 200,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 10),
+              Container(
+                height: 20,
+                width: 150,
+                color: Colors.white,
+              ),
+            ],
           ),
         ),
       ),
@@ -376,7 +424,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _toggleEditing();
     } catch (e) {
       // Handle error
-      print('Error updating user profile: $e');
+      if (kDebugMode) {
+        print('Error updating user profile: $e');
+      }
     }
   }
 

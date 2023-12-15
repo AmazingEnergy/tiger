@@ -96,10 +96,19 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
   Widget _buildHistorySearchScreen() {
     if (!isProMember) {
       return const Center(
-        child: Text(
-          "Subscribe to the Membership program to view search history",
-          style: TextStyle(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Subscribe To The Membership Program To View The Search History",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       );
     }
