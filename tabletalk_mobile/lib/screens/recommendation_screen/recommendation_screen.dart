@@ -36,9 +36,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
   List<RecipeSearchResult> recipes = List.empty(growable: true);
   List<RestaurantSearchResult> restaurants = List.empty(growable: true);
 
-  double buttonPositionX = 0;
-  double buttonPositionY = 0;
-
   @override
   void initState() {
     super.initState();
@@ -75,10 +72,8 @@ class _RecommendScreenState extends State<RecommendScreen> {
         }
 
         try {
-          final location =
-              // ignore: use_build_context_synchronously
-              Provider.of<LocationProvider>(context, listen: false)
-                  .currentLocation;
+          final location = Provider.of<LocationProvider>(context, listen: false)
+              .currentLocation;
           double latitude = location?.latitude as double;
           double longtitude = location?.longitude as double;
           restaurants = await restaurantSearchService
@@ -96,17 +91,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
         loading = false;
       });
     }
-  }
-
-  // Add constraints to keep the button within the screen bounds
-  void updateButtonPosition(double dx, double dy) {
-    final maxX = MediaQuery.of(context).size.width - 56;
-    final maxY = MediaQuery.of(context).size.height - 56;
-
-    setState(() {
-      buttonPositionX = dx.clamp(0.0, maxX);
-      buttonPositionY = dy.clamp(0.0, maxY);
-    });
   }
 
   @override
@@ -165,36 +149,15 @@ class _RecommendScreenState extends State<RecommendScreen> {
               ),
             ),
             Positioned(
-              bottom: buttonPositionY,
-              right: buttonPositionX,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Draggable(
-                  childWhenDragging: Container(),
-                  feedback: LikeDislikeButtons(
-                    onLike: () {
-                      print('Liked');
-                    },
-                    onDislike: () {
-                      print('Disliked');
-                    },
-                  ),
-                  onDragEnd: (dragDetails) {
-                    // Update the position of the buttons within constraints
-                    updateButtonPosition(
-                      dragDetails.offset.dx,
-                      dragDetails.offset.dy,
-                    );
-                  },
-                  child: LikeDislikeButtons(
-                    onLike: () {
-                      print('Liked');
-                    },
-                    onDislike: () {
-                      print('Disliked');
-                    },
-                  ),
-                ),
+              bottom: 16.0,
+              right: 16.0,
+              child: LikeDislikeButtons(
+                onLike: () {
+                  print('Liked');
+                },
+                onDislike: () {
+                  print('Disliked');
+                },
               ),
             ),
           ],
