@@ -1,19 +1,17 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/profile_model.dart';
-import 'package:tabletalk_mobile/data/profile_data.dart';
-import 'package:tabletalk_mobile/widgets/custom_bottom_bar.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/services/user_profile_service.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
+import 'package:country_list_pick/country_list_pick.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key, required this.userProfile}) : super(key: key);
-
-  final UserProfile userProfile;
+  const ProfileScreen({super.key});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -21,168 +19,297 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditing = false;
-  XFile? _selectedImage;
+  bool _isLoading = true;
+  late UserProfile userProfile;
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _nationalityController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _favoriteMealsController =
+      TextEditingController();
+  final TextEditingController _hateMealsController = TextEditingController();
+  final TextEditingController _eatingHabitsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile().then((_) {
+      setState(() => _isLoading = false);
+    });
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.credentials == null) {
+        authProvider.loginAction(context);
+      }
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      UserProfileService userProfileService =
+          UserProfileService(accessToken: accessToken);
+      userProfile = await userProfileService.getProfile();
+      _updateTextControllers();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading user profile: $e');
+        userProfile = UserProfile(
+          id: 'userProfile.id',
+          accountId: 'userProfile.accountId',
+          fullName: 'userProfile.text',
+          email: 'userProfile.email',
+          phone: 'userProfile.phone',
+          address: 'userProfile.text',
+          nationality: 'userProfile.text',
+          country: 'userProfile.text',
+          bio: 'userProfile.text',
+          favoriteMeals: 'userProfile.text',
+          hateMeals: 'userProfile.text',
+          eatingHabits: '1',
+          membership: 'pro',
+          searchCount: 'userProfile.searchCount',
+        );
+      }
+    }
+  }
+
+  String getImageFromAuthProvider() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    return authProvider.credentials?.user.pictureUrl.toString() ?? '';
+  }
+
+  void _updateTextControllers() {
+    _fullNameController.text = userProfile.fullName;
+    _addressController.text = userProfile.address ?? '';
+    _nationalityController.text = userProfile.nationality ?? '';
+    _countryController.text = userProfile.country ?? '';
+    _bioController.text = userProfile.bio ?? '';
+    _favoriteMealsController.text = userProfile.favoriteMeals ?? '';
+    _hateMealsController.text = userProfile.hateMeals ?? '';
+    _eatingHabitsController.text = userProfile.eatingHabits.toString();
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _addressController.dispose();
+    _nationalityController.dispose();
+    _countryController.dispose();
+    _bioController.dispose();
+    _favoriteMealsController.dispose();
+    _hateMealsController.dispose();
+    _eatingHabitsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('My Profile'),
+          backgroundColor: Colors.white,
+          title: const Text(
+            'My Profile',
+            style: TextStyle(
+              color: Color(0xFFFD637C),
+              fontSize: 24,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          child: _isLoading ? _buildShimmerEffect() : _buildProfileScreen(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileScreen() {
+    bool isProMember = userProfile.membership == "pro";
+
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildProfileImage(isProMember),
+              const SizedBox(height: 20),
+              if (isProMember)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'My Profile',
-                      style: TextStyle(
-                        color: Color(0xFFFD637C),
-                        fontSize: 24,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Profile Image
-                    Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (_isEditing) {
-                              _selectProfilePicture(context);
-                            }
-                          },
-                          child: Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: appTheme.blueGray100,
-                                width: 2,
-                              ),
-                              image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: _selectedImage != null
-                                    ? FileImage(File(_selectedImage!.path))
-                                        as ImageProvider<Object>
-                                    : NetworkImage(widget.userProfile.imageUrl),
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (_isEditing)
-                          Positioned(
-                            bottom: 4,
-                            right: 4,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFFFD637C),
-                              ),
-                              child: IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
-                                onPressed: () {
-                                  _selectProfilePicture(context);
-                                },
-                                splashRadius: 24,
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                padding: const EdgeInsets.all(8),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Subscription Button
-                    _buildSubscribeButton(),
-
-                    const SizedBox(height: 20),
-
-                    // Profile Fields
-                    _buildProfileField("Email", widget.userProfile.email),
-                    _buildProfileField(
-                        "Full Name", widget.userProfile.fullName),
-                    _buildProfileField("Address", widget.userProfile.address),
-                    _buildProfileField(
-                        "Nationality", widget.userProfile.nationality),
-                    _buildProfileField("Bio", widget.userProfile.bio),
-                    _buildProfileField(
-                        "Favorite Meals", widget.userProfile.favoriteMeals),
-                    _buildProfileField(
-                        "Hate Meals", widget.userProfile.hateMeals),
-                    _buildProfileField("Eating Habit",
-                        widget.userProfile.eatingHabit.toString()),
-
-                    const SizedBox(height: 20),
-
-                    // Third Row: Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Save/Edit Button
-                        CustomElevatedButton(
-                          height: 50,
-                          width: 100,
-                          text: _isEditing ? "Save" : "Edit",
-                          buttonTextStyle: const TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            fontSize: 15,
-                          ),
-                          buttonStyle: CustomButtonStyles.none,
-                          decoration: CustomButtonStyles
-                              .gradientPrimaryToOnPrimaryContainerDecoration,
-                          onPressed: () {
-                            if (_isEditing) {
-                              _saveProfileChanges(context);
-                            } else {
-                              _toggleEditing();
-                            }
-                          },
-                        ),
-
-                        // Logout Button
-                        CustomElevatedButton(
-                          height: 50,
-                          width: 100,
-                          text: "Logout",
-                          buttonTextStyle: const TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            fontSize: 15,
-                          ),
-                          buttonStyle: CustomButtonStyles.none,
-                          decoration: CustomButtonStyles
-                              .gradientPrimaryToOnPrimaryContainerDecoration,
-                          onPressed: () {
-                            _logout(context);
-                          },
-                        ),
-                      ],
-                    ),
+                    _buildGradientIcon(),
+                    const SizedBox(width: 4),
+                    _buildProText(),
+                    const SizedBox(width: 4),
+                    _buildGradientIcon(),
                   ],
                 ),
+              if (!isProMember) _buildSubscribeButton(),
+              const SizedBox(height: 20),
+              _buildProfileField("Full Name", _fullNameController),
+              _buildProfileField("Address", _addressController),
+              _buildProfileField("Nationality", _nationalityController),
+              _buildProfileField("Country", _countryController,
+                  isDropList: true),
+              _buildProfileField("Bio", _bioController),
+              _buildProfileField("Favorite Meals", _favoriteMealsController),
+              _buildProfileField("Hate Meals", _hateMealsController),
+              _buildProfileField("Eating Habits", _eatingHabitsController,
+                  isDropList: true),
+              const SizedBox(height: 20),
+              // Save/Edit and Logout Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (_isEditing)
+                    CustomElevatedButton(
+                      height: 50,
+                      width: 100,
+                      text: "Cancel",
+                      buttonTextStyle: const TextStyle(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 15,
+                      ),
+                      buttonStyle: CustomButtonStyles.none,
+                      decoration: CustomButtonStyles
+                          .gradientPrimaryToOnPrimaryContainerDecoration,
+                      onPressed: _cancelEdit,
+                    ),
+                  CustomElevatedButton(
+                    height: 50,
+                    width: 100,
+                    text: _isEditing ? "Save" : "Edit",
+                    buttonTextStyle: const TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 15,
+                    ),
+                    buttonStyle: CustomButtonStyles.none,
+                    decoration: CustomButtonStyles
+                        .gradientPrimaryToOnPrimaryContainerDecoration,
+                    onPressed: () {
+                      if (_isEditing) {
+                        _saveProfileChanges(context);
+                      } else {
+                        _toggleEditing();
+                      }
+                    },
+                  ),
+                  CustomElevatedButton(
+                    height: 50,
+                    width: 100,
+                    text: "Logout",
+                    buttonTextStyle: const TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 15,
+                    ),
+                    buttonStyle: CustomButtonStyles.none,
+                    decoration: CustomButtonStyles
+                        .gradientPrimaryToOnPrimaryContainerDecoration,
+                    onPressed: () {
+                      _logout(context);
+                    },
+                  ),
+                ],
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildProfileField(String label, String value) {
+  Widget _buildShimmerEffect() {
+    return Center(
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const CircleAvatar(
+              radius: 60,
+              backgroundColor: Colors.white,
+            ),
+            const SizedBox(height: 20),
+            Container(
+              height: 20,
+              width: 200,
+              color: Colors.white,
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: 20,
+              width: 150,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileImage(bool isProMember) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: appTheme.blueGray100,
+              width: 2,
+            ),
+            image: DecorationImage(
+              fit: BoxFit.fill,
+              image: NetworkImage(getImageFromAuthProvider()),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProText() {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color.fromARGB(255, 242, 7, 7),
+          Color.fromARGB(255, 255, 120, 2)
+        ],
+      ).createShader(bounds),
+      child: const Text(
+        'PRO',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGradientIcon() {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color.fromARGB(255, 242, 7, 7),
+          Color.fromARGB(255, 255, 120, 2)
+        ],
+      ).createShader(bounds),
+      child: const Icon(Icons.auto_awesome, color: Colors.white, size: 35),
+    );
+  }
+
+  Widget _buildProfileField(String label, TextEditingController controller,
+      {bool isDropList = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -196,21 +323,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        CustomTextFormField(
-          hintText: value,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          borderDecoration: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: appTheme.blueGray100,
-              width: 2,
+        if (!isDropList || !_isEditing)
+          CustomTextFormField(
+            controller: controller,
+            hintText: controller.text,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            borderDecoration: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: appTheme.blueGray100,
+                width: 2,
+              ),
             ),
+            enabled: _isEditing,
           ),
-          enabled: _isEditing && label != "Email",
-        ),
+        if (isDropList && _isEditing)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: label == "Country"
+                    ? _buildCountryDropdown(controller)
+                    : _buildEatingHabitsDropdown(controller),
+              ),
+            ],
+          ),
         const SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _buildCountryDropdown(TextEditingController controller) {
+    return CountryListPick(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        title: const Text('Choose a country'),
+      ),
+      theme: CountryTheme(
+        isShowFlag: true,
+        isShowTitle: true,
+        isShowCode: false,
+        isDownIcon: true,
+        showEnglishName: true,
+      ),
+      initialSelection: controller.text,
+      onChanged: (CountryCode? code) {
+        if (code != null) {
+          controller.text = code.name!;
+        }
+      },
+    );
+  }
+
+  Widget _buildEatingHabitsDropdown(TextEditingController controller) {
+    return DropdownButton<String>(
+      value: controller.text,
+      items: List<DropdownMenuItem<String>>.generate(
+        8,
+        (index) => DropdownMenuItem(
+          value: (index + 1).toString(),
+          child: Text((index + 1).toString()),
+        ),
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          controller.text = newValue!;
+        });
+      },
     );
   }
 
@@ -226,7 +406,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.orange, Colors.red],
+            colors: [
+              Color.fromARGB(255, 242, 7, 7),
+              Color.fromARGB(255, 255, 120, 2)
+            ],
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -252,39 +435,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _saveProfileChanges(BuildContext context) {
-    // Add logic to save
-    // Update the UserProfile model with the new values from the text fields.
-    // call API update
-    // After saving disable editing again.
-    _toggleEditing();
+  void _saveProfileChanges(BuildContext context) async {
+    try {
+      UserProfile updatedProfile = UserProfile(
+        id: userProfile.id,
+        accountId: userProfile.accountId,
+        fullName: _fullNameController.text,
+        email: userProfile.email,
+        phone: userProfile.phone,
+        address: _addressController.text,
+        nationality: _nationalityController.text,
+        country: _countryController.text,
+        bio: _bioController.text,
+        favoriteMeals: _favoriteMealsController.text,
+        hateMeals: _hateMealsController.text,
+        eatingHabits: _eatingHabitsController.text,
+        membership: userProfile.membership,
+        searchCount: userProfile.searchCount,
+      );
+
+      print(updatedProfile.country);
+      print(updatedProfile.eatingHabits);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.credentials == null) {
+        authProvider.loginAction(context);
+        return;
+      }
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      UserProfileService userProfileService =
+          UserProfileService(accessToken: accessToken);
+      await userProfileService.updateProfile(userProfile.id, updatedProfile);
+
+      setState(() {
+        userProfile = updatedProfile;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating user profile: $e');
+      }
+    } finally {
+      setState(() {
+        _isEditing = false;
+      });
+    }
   }
 
   void _logout(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.logoutAction();
-
     // ignore: use_build_context_synchronously
     Navigator.pushReplacementNamed(context, AppRoutes.startScreen);
   }
 
-  void _selectProfilePicture(BuildContext context) async {
-    if (_isEditing) {
-      XFile? selectedImage =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-
-      if (selectedImage != null) {
-        setState(() {
-          _selectedImage = selectedImage;
-        });
-      }
-    }
-  }
-
   void _toggleEditing() {
-    // Toggle editing
     setState(() {
       _isEditing = !_isEditing;
+    });
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      _updateTextControllers();
+      _isEditing = false;
     });
   }
 }

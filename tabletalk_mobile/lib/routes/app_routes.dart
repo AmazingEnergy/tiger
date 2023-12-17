@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tabletalk_mobile/data/profile_data.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
+import 'package:tabletalk_mobile/screens/history_screen/history_screen_container.dart';
 import 'package:tabletalk_mobile/screens/profile_screen/profile_screen.dart';
 import 'package:tabletalk_mobile/screens/screens_container/screens_container.dart';
 import 'package:tabletalk_mobile/screens/start_screen/start_screen.dart';
@@ -18,11 +18,12 @@ class AppRoutes {
   static const String recipeDetailScreen = '/recipe_detail_screen';
   static const String restaurantDetailScreen = '/restaurant_detail_screen';
   static const String profileScreen = '/profile_screen';
+  static const String historyScreen = '/history_screen_container';
 
   static Map<String, WidgetBuilder> routes = {
     startScreen: (context) => const StartScreen(),
-    searchScreen: (context) => SearchScreen(),
-    screensContainer: (context) => ScreensContainer(),
+    searchScreen: (context) => const SearchScreen(),
+    screensContainer: (context) => const ScreensContainer(),
     recipeDetailScreen: (context) {
       final RecipeDetail recipeDetail =
           ModalRoute.of(context)!.settings.arguments as RecipeDetail;
@@ -43,6 +44,7 @@ class AppRoutes {
         searchId: searchId,
       );
     },
-    profileScreen: (context) => ProfileScreen(userProfile: userProfileData),
+    profileScreen: (context) => const ProfileScreen(),
+    historyScreen: (context) => const HistoryScreenContainer(),
   };
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
-import 'package:tabletalk_mobile/main.dart';
-import 'package:tabletalk_mobile/models/search_id.dart';
+import 'package:tabletalk_mobile/models/search_id_model.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/recommendation_screen.dart';
 import 'package:tabletalk_mobile/services/search_id_data_service.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
@@ -115,7 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<String> getSearchId(BuildContext context, String searchText) async {
     final capturedContext = context;
-    SearchId searchId;
+    SearchIdModel searchId;
     final authProvider =
         Provider.of<AuthProvider>(capturedContext, listen: false);
     if (authProvider.credentials != null) {
@@ -124,7 +124,7 @@ class _SearchScreenState extends State<SearchScreen> {
       SearchIdDataService searchIdDataService =
           SearchIdDataService(accessToken: accessToken);
 
-      searchId = await searchIdDataService.fetchSearchIds(searchText);
+      searchId = await searchIdDataService.fetchSearchIdModels(searchText);
     } else {
       throw Exception('Failed to load data');
     }
@@ -139,6 +139,9 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
+/*       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.logoutAction(); */
+
       String searchId = await getSearchId(context, searchText);
       print(searchId);
       // ignore: use_build_context_synchronously

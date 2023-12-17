@@ -1,21 +1,27 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:tabletalk_mobile/main.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/recipe_search_result.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_search_result.dart';
-import 'package:tabletalk_mobile/routes/app_routes.dart';
+import 'package:tabletalk_mobile/models/search_id_model.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/providers/location_provider.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/recipe_box.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/restaurant_box.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/search_box.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/like_dislike_buttons.dart';
 import 'package:tabletalk_mobile/services/recipe_data_service.dart';
 import 'package:tabletalk_mobile/services/recipe_result_data_service.dart';
 import 'package:tabletalk_mobile/services/restaurant_data_serivce.dart';
 import 'package:tabletalk_mobile/services/restaurant_result_data_service.dart';
+import 'package:tabletalk_mobile/services/search_id_data_service.dart';
 
 class RecommendScreen extends StatefulWidget {
   final String searchText;
@@ -32,6 +38,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
   bool loading = true;
   List<RecipeSearchResult> recipes = List.empty(growable: true);
   List<RestaurantSearchResult> restaurants = List.empty(growable: true);
+  String? feedback;
 
   @override
   void initState() {
@@ -58,33 +65,48 @@ class _RecommendScreenState extends State<RecommendScreen> {
 
         RecipeSearchService recipeSearchService =
             RecipeSearchService(accessToken: accessToken);
-        RestaurantSearchService restaurantSearchService =
-            RestaurantSearchService(accessToken: accessToken);
-
         try {
           recipes =
               await recipeSearchService.fetchRecipeSearchResults(searchId);
         } catch (recipeError) {
-          print('Error fetching recipe: $recipeError');
+          if (kDebugMode) {
+            print('Error fetching recipe: $recipeError');
+          }
         }
 
+        RestaurantSearchService restaurantSearchService =
+            RestaurantSearchService(accessToken: accessToken);
         try {
-          final location =
-              // ignore: use_build_context_synchronously
-              Provider.of<LocationProvider>(context, listen: false)
-                  .currentLocation;
+          final location = Provider.of<LocationProvider>(context, listen: false)
+              .currentLocation;
           double latitude = location?.latitude as double;
           double longtitude = location?.longitude as double;
           restaurants = await restaurantSearchService
               .fetchRestaurantSearchResults(searchId, latitude, longtitude);
         } catch (restaurantError) {
-          print('Error fetching restaurant: $restaurantError');
+          if (kDebugMode) {
+            print('Error fetching restaurant: $restaurantError');
+          }
+        }
+
+        SearchIdDataService searchIdDataService =
+            SearchIdDataService(accessToken: accessToken);
+        try {
+          SearchIdDetailModel searchIdDetail =
+              await searchIdDataService.fetchSearchIdDetail(searchId);
+          feedback = searchIdDetail.feedback;
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error fetching search detail: $e');
+          }
         }
       } else {
         throw Exception('Failed to load data');
       }
     } catch (e) {
-      print('Error: $e');
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     } finally {
       setState(() {
         loading = false;
@@ -92,58 +114,97 @@ class _RecommendScreenState extends State<RecommendScreen> {
     }
   }
 
+  void _refreshFeedback() async {
+    try {
+      final String accessToken =
+          Provider.of<AuthProvider>(context, listen: false)
+              .credentials!
+              .accessToken;
+      SearchIdDataService searchIdDataService =
+          SearchIdDataService(accessToken: accessToken);
+      SearchIdDetailModel searchIdDetail =
+          await searchIdDataService.fetchSearchIdDetail(widget.searchId);
+
+      if (kDebugMode) {
+        print('Old feedback: $feedback');
+        print('New feedback: ${searchIdDetail.feedback}');
+      }
+
+      setState(() {
+        feedback = searchIdDetail.feedback;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error refreshing feedback: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              SearchBox(defaultText: widget.searchText),
-              const SizedBox(height: 10), // Adjust this spacing if needed
-              Expanded(
-                child: DefaultTabController(
-                  length: 2,
-                  child: Column(
-                    children: <Widget>[
-                      TabBar(
-                        indicatorWeight: 3.0,
-                        labelStyle: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                        ),
-                        tabs: [
-                          Tab(
-                            child: Text("Recipes"),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  SearchBox(defaultText: widget.searchText),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: <Widget>[
+                          const TabBar(
+                            indicatorWeight: 3.0,
+                            labelStyle: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                            ),
+                            tabs: [
+                              Tab(
+                                child: Text("Recipes"),
+                              ),
+                              Tab(
+                                child: Text("Restaurant"),
+                              ),
+                            ],
                           ),
-                          Tab(
-                            child: Text("Restaurant"),
+                          Expanded(
+                            child: TabBarView(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: _buildListRecipe(),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: _buildListRestaurant(),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: _buildListRecipe(),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: _buildListRestaurant(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                ],
+              ),
+            ),
+            if (feedback == null || feedback!.isEmpty)
+              Positioned(
+                bottom: 16.0,
+                right: 16.0,
+                child: LikeDislikeButtons(
+                  searchId: widget.searchId,
+                  onActionCompleted: _refreshFeedback,
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -202,14 +263,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
     );
   }
 
-  void startColorChangingAnimation() {
-    Future.delayed(Duration(milliseconds: 500), () {
-      setState(() {
-        // Add your color changing animation logic here if needed
-      });
-    });
-  }
-
   Future<RecipeDetail> getRecipeDetails(
       BuildContext context, String recipeId) async {
     final capturedContext = context;
@@ -233,7 +286,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
   void goToRecipeDetailScreen(BuildContext context, String recipeId) async {
     RecipeDetail recipeDetail = await getRecipeDetails(context, recipeId);
 
-    // ignore: use_build_context_synchronously
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -280,38 +332,4 @@ class _RecommendScreenState extends State<RecommendScreen> {
       ),
     );
   }
-}
-
-Future<RestaurantDetail> getRestaurantDetails(
-    BuildContext context, String restaurantId) async {
-  final capturedContext = context;
-  RestaurantDetail restaurantDetail;
-  final authProvider =
-      Provider.of<AuthProvider>(capturedContext, listen: false);
-  if (authProvider.credentials != null) {
-    final String accessToken = authProvider.credentials!.accessToken;
-
-    RestaurantDataService restaurantDataService =
-        RestaurantDataService(accessToken: accessToken);
-
-    restaurantDetail =
-        await restaurantDataService.fetchRestaurantDetails(restaurantId);
-  } else {
-    throw Exception('Failed to load data');
-  }
-
-  return restaurantDetail;
-}
-
-void goToRestaurantDetailScreen(
-    BuildContext context, String restaurantId) async {
-  RestaurantDetail restaurantDetail =
-      await getRestaurantDetails(context, restaurantId);
-
-  // ignore: use_build_context_synchronously
-  Navigator.pushNamed(
-    context,
-    AppRoutes.restaurantDetailScreen,
-    arguments: restaurantDetail,
-  );
 }
