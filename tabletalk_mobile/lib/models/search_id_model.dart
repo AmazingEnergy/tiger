@@ -16,14 +16,14 @@ class SearchIdDetailModel {
   final String id;
   final String searchText;
   final String createdAt;
-  final String? feedback;
+  final String feedback;
   final List<ResultItem> result;
 
   SearchIdDetailModel({
     required this.id,
     required this.searchText,
     required this.createdAt,
-    this.feedback,
+    required this.feedback,
     required this.result,
   });
 
@@ -33,10 +33,10 @@ class SearchIdDetailModel {
         resultList.map((i) => ResultItem.fromJson(i)).toList();
 
     return SearchIdDetailModel(
-      id: json['id'],
-      searchText: json['searchText'],
-      createdAt: json['createdAt'],
-      feedback: json['feedback'],
+      id: json['id'] ?? '',
+      searchText: json['searchText'] ?? '',
+      createdAt: json['createdAt'] ?? '',
+      feedback: json['feedback'] ?? '',
       result: resultItems,
     );
   }

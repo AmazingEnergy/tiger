@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -5,9 +8,9 @@ import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/recipe_search_result.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_search_result.dart';
+import 'package:tabletalk_mobile/models/search_id_model.dart';
 import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/providers/location_provider.dart';
-import 'package:tabletalk_mobile/routes/app_routes.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/widgets/recipe_box.dart';
@@ -18,14 +21,14 @@ import 'package:tabletalk_mobile/services/recipe_data_service.dart';
 import 'package:tabletalk_mobile/services/recipe_result_data_service.dart';
 import 'package:tabletalk_mobile/services/restaurant_data_serivce.dart';
 import 'package:tabletalk_mobile/services/restaurant_result_data_service.dart';
+import 'package:tabletalk_mobile/services/search_id_data_service.dart';
 
 class RecommendScreen extends StatefulWidget {
   final String searchText;
   final String searchId;
 
   const RecommendScreen(
-      {Key? key, required this.searchText, required this.searchId})
-      : super(key: key);
+      {super.key, required this.searchText, required this.searchId});
 
   @override
   State<RecommendScreen> createState() => _RecommendScreenState();
@@ -35,11 +38,12 @@ class _RecommendScreenState extends State<RecommendScreen> {
   bool loading = true;
   List<RecipeSearchResult> recipes = List.empty(growable: true);
   List<RestaurantSearchResult> restaurants = List.empty(growable: true);
+  String? feedback;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback(_afterPageRender);
+    WidgetsBinding.instance.addPostFrameCallback(_afterPageRender);
   }
 
   _afterPageRender(_) {
@@ -61,16 +65,17 @@ class _RecommendScreenState extends State<RecommendScreen> {
 
         RecipeSearchService recipeSearchService =
             RecipeSearchService(accessToken: accessToken);
-        RestaurantSearchService restaurantSearchService =
-            RestaurantSearchService(accessToken: accessToken);
-
         try {
           recipes =
               await recipeSearchService.fetchRecipeSearchResults(searchId);
         } catch (recipeError) {
-          print('Error fetching recipe: $recipeError');
+          if (kDebugMode) {
+            print('Error fetching recipe: $recipeError');
+          }
         }
 
+        RestaurantSearchService restaurantSearchService =
+            RestaurantSearchService(accessToken: accessToken);
         try {
           final location = Provider.of<LocationProvider>(context, listen: false)
               .currentLocation;
@@ -79,7 +84,21 @@ class _RecommendScreenState extends State<RecommendScreen> {
           restaurants = await restaurantSearchService
               .fetchRestaurantSearchResults(searchId, latitude, longtitude);
         } catch (restaurantError) {
-          print('Error fetching restaurant: $restaurantError');
+          if (kDebugMode) {
+            print('Error fetching restaurant: $restaurantError');
+          }
+        }
+
+        SearchIdDataService searchIdDataService =
+            SearchIdDataService(accessToken: accessToken);
+        try {
+          SearchIdDetailModel searchIdDetail =
+              await searchIdDataService.fetchSearchIdDetail(searchId);
+          feedback = searchIdDetail.feedback;
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error fetching search detail: $e');
+          }
         }
       } else {
         throw Exception('Failed to load data');
@@ -148,18 +167,19 @@ class _RecommendScreenState extends State<RecommendScreen> {
                 ],
               ),
             ),
-            Positioned(
-              bottom: 16.0,
-              right: 16.0,
-              child: LikeDislikeButtons(
-                onLike: () {
-                  print('Liked');
-                },
-                onDislike: () {
-                  print('Disliked');
-                },
+            if (feedback == null || feedback!.isEmpty)
+              Positioned(
+                bottom: 16.0,
+                right: 16.0,
+                child: LikeDislikeButtons(
+                  onLike: () {
+                    print('Liked');
+                  },
+                  onDislike: () {
+                    print('Disliked');
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),

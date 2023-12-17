@@ -13,7 +13,11 @@ class _ScreensContainerState extends State<ScreensContainer> {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey();
   String _currentRoute = AppRoutes.searchScreen; // Set to initial route
 
-  final List<String> routesWithoutBottomBar = [AppRoutes.startScreen];
+  final List<String> routesWithoutBottomBar = [
+    AppRoutes.startScreen,
+    AppRoutes.startScreen,
+    AppRoutes.screensContainer
+  ];
 
   @override
   Widget build(BuildContext context) {

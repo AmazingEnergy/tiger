@@ -18,10 +18,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditing = false;
+  bool _isLoading = true;
   late UserProfile userProfile;
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _favoriteMealsController =
       TextEditingController();
@@ -31,7 +33,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    _loadUserProfile().then((_) {
+      setState(() => _isLoading = false);
+    });
   }
 
   Future<void> _loadUserProfile() async {
@@ -62,10 +66,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _fullNameController.text = userProfile.fullName;
     _addressController.text = userProfile.address ?? '';
     _nationalityController.text = userProfile.nationality ?? '';
+    _countryController.text = userProfile.country ?? '';
     _bioController.text = userProfile.bio ?? '';
     _favoriteMealsController.text = userProfile.favoriteMeals ?? '';
     _hateMealsController.text = userProfile.hateMeals ?? '';
-    _eatingHabitsController.text = userProfile.eatingHabits ?? '';
+    _eatingHabitsController.text = userProfile.eatingHabits.toString();
   }
 
   @override
@@ -73,6 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _fullNameController.dispose();
     _addressController.dispose();
     _nationalityController.dispose();
+    _countryController.dispose();
     _bioController.dispose();
     _favoriteMealsController.dispose();
     _hateMealsController.dispose();
@@ -82,25 +88,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _simulateDelay(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildShimmerEffect();
-        } else {
-          return _buildProfileScreen();
-        }
-      },
-    );
-  }
-
-  Widget _buildProfileScreen() {
-    bool isProMember = userProfile.membership == "pro";
-
     return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -115,135 +104,132 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          child: _isLoading ? _buildShimmerEffect() : _buildProfileScreen(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileScreen() {
+    bool isProMember = userProfile.membership == "pro";
+
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildProfileImage(isProMember),
+              const SizedBox(height: 20),
+              if (isProMember)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildProfileImage(isProMember),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isProMember) ...[
-                          _buildGradientIcon(),
-                          const SizedBox(width: 4),
-                          _buildProText(),
-                          const SizedBox(width: 4),
-                          _buildGradientIcon(),
-                        ]
-                      ],
-                    ),
-                    if (!isProMember) _buildSubscribeButton(),
-                    const SizedBox(height: 20),
-                    // Profile Fields
-                    _buildProfileField("Full Name", _fullNameController),
-                    _buildProfileField("Address", _addressController),
-                    _buildProfileField("Nationality", _nationalityController),
-                    _buildProfileField("Bio", _bioController),
-                    _buildProfileField(
-                        "Favorite Meals", _favoriteMealsController),
-                    _buildProfileField("Hate Meals", _hateMealsController),
-                    _buildProfileField(
-                        "Eating Habits", _eatingHabitsController),
-                    const SizedBox(height: 20),
-                    // Save/Edit and Logout Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        if (_isEditing)
-                          CustomElevatedButton(
-                            height: 50,
-                            width: 100,
-                            text: "Cancel",
-                            buttonTextStyle: const TextStyle(
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              fontSize: 15,
-                            ),
-                            buttonStyle: CustomButtonStyles.none,
-                            decoration: CustomButtonStyles
-                                .gradientPrimaryToOnPrimaryContainerDecoration,
-                            onPressed: _cancelEdit,
-                          ),
-                        CustomElevatedButton(
-                          height: 50,
-                          width: 100,
-                          text: _isEditing ? "Save" : "Edit",
-                          buttonTextStyle: const TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            fontSize: 15,
-                          ),
-                          buttonStyle: CustomButtonStyles.none,
-                          decoration: CustomButtonStyles
-                              .gradientPrimaryToOnPrimaryContainerDecoration,
-                          onPressed: () {
-                            if (_isEditing) {
-                              _saveProfileChanges(context);
-                            } else {
-                              _toggleEditing();
-                            }
-                          },
-                        ),
-                        CustomElevatedButton(
-                          height: 50,
-                          width: 100,
-                          text: "Logout",
-                          buttonTextStyle: const TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            fontSize: 15,
-                          ),
-                          buttonStyle: CustomButtonStyles.none,
-                          decoration: CustomButtonStyles
-                              .gradientPrimaryToOnPrimaryContainerDecoration,
-                          onPressed: () {
-                            _logout(context);
-                          },
-                        ),
-                      ],
-                    ),
+                    _buildGradientIcon(),
+                    const SizedBox(width: 4),
+                    _buildProText(),
+                    const SizedBox(width: 4),
+                    _buildGradientIcon(),
                   ],
                 ),
+              if (!isProMember) _buildSubscribeButton(),
+              const SizedBox(height: 20),
+              _buildProfileField("Full Name", _fullNameController),
+              _buildProfileField("Address", _addressController),
+              _buildProfileField("Nationality", _nationalityController),
+              _buildProfileField("Country", _countryController),
+              _buildProfileField("Bio", _bioController),
+              _buildProfileField("Favorite Meals", _favoriteMealsController),
+              _buildProfileField("Hate Meals", _hateMealsController),
+              _buildProfileField("Eating Habits", _eatingHabitsController),
+              const SizedBox(height: 20),
+              // Save/Edit and Logout Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (_isEditing)
+                    CustomElevatedButton(
+                      height: 50,
+                      width: 100,
+                      text: "Cancel",
+                      buttonTextStyle: const TextStyle(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 15,
+                      ),
+                      buttonStyle: CustomButtonStyles.none,
+                      decoration: CustomButtonStyles
+                          .gradientPrimaryToOnPrimaryContainerDecoration,
+                      onPressed: _cancelEdit,
+                    ),
+                  CustomElevatedButton(
+                    height: 50,
+                    width: 100,
+                    text: _isEditing ? "Save" : "Edit",
+                    buttonTextStyle: const TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 15,
+                    ),
+                    buttonStyle: CustomButtonStyles.none,
+                    decoration: CustomButtonStyles
+                        .gradientPrimaryToOnPrimaryContainerDecoration,
+                    onPressed: () {
+                      if (_isEditing) {
+                        _saveProfileChanges(context);
+                      } else {
+                        _toggleEditing();
+                      }
+                    },
+                  ),
+                  CustomElevatedButton(
+                    height: 50,
+                    width: 100,
+                    text: "Logout",
+                    buttonTextStyle: const TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 15,
+                    ),
+                    buttonStyle: CustomButtonStyles.none,
+                    decoration: CustomButtonStyles
+                        .gradientPrimaryToOnPrimaryContainerDecoration,
+                    onPressed: () {
+                      _logout(context);
+                    },
+                  ),
+                ],
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Future<void> _simulateDelay() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-  }
-
   Widget _buildShimmerEffect() {
-    return Scaffold(
-      body: Center(
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const CircleAvatar(
-                radius: 60,
-                backgroundColor: Colors.white,
-              ),
-              const SizedBox(height: 20),
-              Container(
-                height: 20,
-                width: 200,
-                color: Colors.white,
-              ),
-              const SizedBox(height: 10),
-              Container(
-                height: 20,
-                width: 150,
-                color: Colors.white,
-              ),
-            ],
-          ),
+    return Center(
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const CircleAvatar(
+              radius: 60,
+              backgroundColor: Colors.white,
+            ),
+            const SizedBox(height: 20),
+            Container(
+              height: 20,
+              width: 200,
+              color: Colors.white,
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: 20,
+              width: 150,
+              color: Colors.white,
+            ),
+          ],
         ),
       ),
     );
@@ -391,6 +377,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _saveProfileChanges(BuildContext context) async {
     try {
+      
+
       UserProfile updatedProfile = UserProfile(
         id: userProfile.id,
         accountId: userProfile.accountId,
@@ -399,7 +387,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         phone: userProfile.phone,
         address: _addressController.text,
         nationality: _nationalityController.text,
-        country: userProfile.country,
+        country: _countryController.text,
         bio: _bioController.text,
         favoriteMeals: _favoriteMealsController.text,
         hateMeals: _hateMealsController.text,
@@ -408,25 +396,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         searchCount: userProfile.searchCount,
       );
 
+      print(updatedProfile.eatingHabits);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       if (authProvider.credentials == null) {
         authProvider.loginAction(context);
+        return;
       }
       final String accessToken = authProvider.credentials!.accessToken;
 
       UserProfileService userProfileService =
           UserProfileService(accessToken: accessToken);
-
       await userProfileService.updateProfile(userProfile.id, updatedProfile);
 
-      // Update local user profile with new data
-      userProfile = updatedProfile;
-      _toggleEditing();
+      setState(() {
+        userProfile = updatedProfile;
+      });
     } catch (e) {
-      // Handle error
       if (kDebugMode) {
         print('Error updating user profile: $e');
       }
+    } finally {
+      setState(() {
+        _isEditing = false;
+      });
     }
   }
 

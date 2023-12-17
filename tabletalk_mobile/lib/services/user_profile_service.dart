@@ -25,6 +25,16 @@ class UserProfileService {
   }
 
   Future<void> updateProfile(String id, UserProfile updatedProfile) async {
+    int? eatingHabitsNumber;
+
+    try {
+      if (updatedProfile.eatingHabits != null) {
+        eatingHabitsNumber = int.parse(updatedProfile.eatingHabits!);
+      }
+    } catch (e) {
+      throw Exception('Eating habits must be a valid number');
+    }
+
     final response = await http.put(
       Uri.parse('https://api.amzegy.com/core/api/v1/customers/$id'),
       headers: {
@@ -34,19 +44,19 @@ class UserProfileService {
       body: json.encode({
         "fullName": updatedProfile.fullName,
         "address": updatedProfile.address,
-        "phone": updatedProfile.phone,
+        "phone": updatedProfile.phone ?? '0',
         "nationality": updatedProfile.nationality,
         "country": updatedProfile.country,
         "bio": updatedProfile.bio,
         "favoriteMeals": updatedProfile.favoriteMeals,
         "hateMeals": updatedProfile.hateMeals,
-        "eatingHabits": updatedProfile.eatingHabits,
+        "eatingHabits": eatingHabitsNumber,
       }),
     );
 
     if (response.statusCode != 200) {
       throw Exception(
-          'Failed to update user profile. Status code: ${response.statusCode}');
+          'Failed to update user profile. Status code: ${response.body}');
     }
   }
 }

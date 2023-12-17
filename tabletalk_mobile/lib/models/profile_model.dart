@@ -45,7 +45,7 @@ class UserProfile {
       bio: profile['bio'],
       favoriteMeals: profile['favoriteMeals'],
       hateMeals: profile['hateMeals'],
-      eatingHabits: profile['eatingHabits'],
+      eatingHabits: profile['eatingHabits'].toString(),
       membership: profile['membership'] ?? 'normal',
       searchCount: profile['searchCount'].toString(),
     );

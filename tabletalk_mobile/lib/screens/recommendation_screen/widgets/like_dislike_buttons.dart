@@ -4,7 +4,8 @@ class LikeDislikeButtons extends StatelessWidget {
   final Function() onLike;
   final Function() onDislike;
 
-  LikeDislikeButtons({required this.onLike, required this.onDislike});
+  LikeDislikeButtons(
+      {super.key, required this.onLike, required this.onDislike});
 
   @override
   Widget build(BuildContext context) {
