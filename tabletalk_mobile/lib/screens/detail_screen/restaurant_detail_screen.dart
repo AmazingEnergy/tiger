@@ -310,11 +310,11 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     }
   }
 
-  void onTapImgArrowLeft(BuildContext context) {
-    Navigator.pop(context);
-  }
-
   void _saveRating(double rating) {
     // save rating logic
+  }
+
+  void onTapImgArrowLeft(BuildContext context) {
+    Navigator.pop(context);
   }
 }

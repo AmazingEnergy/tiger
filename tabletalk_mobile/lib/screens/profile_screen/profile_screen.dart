@@ -8,6 +8,7 @@ import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/services/user_profile_service.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
+import 'package:country_list_pick/country_list_pick.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -154,11 +155,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildProfileField("Full Name", _fullNameController),
               _buildProfileField("Address", _addressController),
               _buildProfileField("Nationality", _nationalityController),
-              _buildProfileField("Country", _countryController),
+              _buildProfileField("Country", _countryController,
+                  isDropList: true),
               _buildProfileField("Bio", _bioController),
               _buildProfileField("Favorite Meals", _favoriteMealsController),
               _buildProfileField("Hate Meals", _hateMealsController),
-              _buildProfileField("Eating Habits", _eatingHabitsController),
+              _buildProfileField("Eating Habits", _eatingHabitsController,
+                  isDropList: true),
               const SizedBox(height: 20),
               // Save/Edit and Logout Buttons
               Row(
@@ -251,17 +254,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  String? _validateEatingHabits(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Eating habit cannot be empty';
-    }
-    final number = int.tryParse(value);
-    if (number == null || number < 1 || number > 8) {
-      return 'Enter a number between 1 and 8';
-    }
-    return null;
-  }
-
   Widget _buildProfileImage(bool isProMember) {
     return Stack(
       alignment: Alignment.center,
@@ -316,7 +308,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileField(String label, TextEditingController controller) {
+  Widget _buildProfileField(String label, TextEditingController controller,
+      {bool isDropList = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -330,23 +323,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        CustomTextFormField(
-          controller: controller,
-          hintText: controller.text,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          borderDecoration: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: appTheme.blueGray100,
-              width: 2,
+        if (!isDropList || !_isEditing)
+          CustomTextFormField(
+            controller: controller,
+            hintText: controller.text,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            borderDecoration: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: appTheme.blueGray100,
+                width: 2,
+              ),
             ),
+            enabled: _isEditing,
           ),
-          enabled: _isEditing && label != "Email",
-          validator: label == "Eating Habits" ? _validateEatingHabits : null,
-        ),
+        if (isDropList && _isEditing)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: label == "Country"
+                    ? _buildCountryDropdown(controller)
+                    : _buildEatingHabitsDropdown(controller),
+              ),
+            ],
+          ),
         const SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _buildCountryDropdown(TextEditingController controller) {
+    return CountryListPick(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        title: const Text('Choose a country'),
+      ),
+      theme: CountryTheme(
+        isShowFlag: true,
+        isShowTitle: true,
+        isShowCode: false,
+        isDownIcon: true,
+        showEnglishName: true,
+      ),
+      initialSelection: controller.text,
+      onChanged: (CountryCode? code) {
+        if (code != null) {
+          controller.text = code.name!;
+        }
+      },
+    );
+  }
+
+  Widget _buildEatingHabitsDropdown(TextEditingController controller) {
+    return DropdownButton<String>(
+      value: controller.text,
+      items: List<DropdownMenuItem<String>>.generate(
+        8,
+        (index) => DropdownMenuItem(
+          value: (index + 1).toString(),
+          child: Text((index + 1).toString()),
+        ),
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          controller.text = newValue!;
+        });
+      },
     );
   }
 
@@ -410,6 +454,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         searchCount: userProfile.searchCount,
       );
 
+      print(updatedProfile.country);
       print(updatedProfile.eatingHabits);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       if (authProvider.credentials == null) {
