@@ -53,6 +53,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (kDebugMode) {
         print('Error loading user profile: $e');
+        userProfile = UserProfile(
+          id: 'userProfile.id',
+          accountId: 'userProfile.accountId',
+          fullName: 'userProfile.text',
+          email: 'userProfile.email',
+          phone: 'userProfile.phone',
+          address: 'userProfile.text',
+          nationality: 'userProfile.text',
+          country: 'userProfile.text',
+          bio: 'userProfile.text',
+          favoriteMeals: 'userProfile.text',
+          hateMeals: 'userProfile.text',
+          eatingHabits: '1',
+          membership: 'pro',
+          searchCount: 'userProfile.searchCount',
+        );
       }
     }
   }
@@ -377,8 +393,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _saveProfileChanges(BuildContext context) async {
     try {
-      
-
       UserProfile updatedProfile = UserProfile(
         id: userProfile.id,
         accountId: userProfile.accountId,

@@ -104,11 +104,39 @@ class _RecommendScreenState extends State<RecommendScreen> {
         throw Exception('Failed to load data');
       }
     } catch (e) {
-      print('Error: $e');
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     } finally {
       setState(() {
         loading = false;
       });
+    }
+  }
+
+  void _refreshFeedback() async {
+    try {
+      final String accessToken =
+          Provider.of<AuthProvider>(context, listen: false)
+              .credentials!
+              .accessToken;
+      SearchIdDataService searchIdDataService =
+          SearchIdDataService(accessToken: accessToken);
+      SearchIdDetailModel searchIdDetail =
+          await searchIdDataService.fetchSearchIdDetail(widget.searchId);
+
+      if (kDebugMode) {
+        print('Old feedback: $feedback');
+        print('New feedback: ${searchIdDetail.feedback}');
+      }
+
+      setState(() {
+        feedback = searchIdDetail.feedback;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error refreshing feedback: $e');
+      }
     }
   }
 
@@ -172,12 +200,8 @@ class _RecommendScreenState extends State<RecommendScreen> {
                 bottom: 16.0,
                 right: 16.0,
                 child: LikeDislikeButtons(
-                  onLike: () {
-                    print('Liked');
-                  },
-                  onDislike: () {
-                    print('Disliked');
-                  },
+                  searchId: widget.searchId,
+                  onActionCompleted: _refreshFeedback,
                 ),
               ),
           ],
@@ -262,7 +286,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
   void goToRecipeDetailScreen(BuildContext context, String recipeId) async {
     RecipeDetail recipeDetail = await getRecipeDetails(context, recipeId);
 
-    // ignore: use_build_context_synchronously
     await Navigator.push(
       context,
       MaterialPageRoute(

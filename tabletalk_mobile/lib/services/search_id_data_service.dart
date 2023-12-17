@@ -44,4 +44,34 @@ class SearchIdDataService {
           'Failed to load data. Error code: ${response.statusCode}');
     }
   }
+
+  Future<void> putSatisfied(String id) async {
+    final response = await http.put(
+      Uri.parse('https://api.amzegy.com/core/api/v1/search/$id/satisfied'),
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to update satisfaction status. Error code: ${response.statusCode}');
+    }
+  }
+
+  Future<void> putDissatisfied(String id) async {
+    final response = await http.put(
+      Uri.parse('https://api.amzegy.com/core/api/v1/search/$id/dissatisfied'),
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to update dissatisfaction status. Error code: ${response.statusCode}');
+    }
+  }
 }
