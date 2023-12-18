@@ -5,9 +5,9 @@ class RecipeBox extends StatelessWidget {
   final RecipeSearchResult model;
 
   const RecipeBox({
-    Key? key,
+    super.key,
     required this.model,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/services/review_rating_service.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class RestaurantDetailScreen extends StatefulWidget {
   final RestaurantDetail restaurantDetail;
-  RestaurantDetailScreen({required this.restaurantDetail, Key? key})
-      : super(key: key);
+  const RestaurantDetailScreen({required this.restaurantDetail, super.key});
 
   @override
   _RestaurantDetailScreenState createState() => _RestaurantDetailScreenState();
@@ -18,8 +20,14 @@ class RestaurantDetailScreen extends StatefulWidget {
 
 class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey();
-  double currentRating = 0.0;
+  late double currentRating;
   bool isStarRated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    currentRating = widget.restaurantDetail.inAppRating;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +127,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${restaurant.name}",
+                  restaurant.name,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -211,40 +219,30 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   Widget _buildRatingBar() {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0),
-      child: GestureDetector(
-        onVerticalDragDown: (details) {
-          setState(() {
-            currentRating = 0.0;
-            isStarRated = false;
-          });
-          _saveRating(currentRating);
-        },
-        child: Container(
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20.0),
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: RatingBar.builder(
+          initialRating: currentRating,
+          minRating: 1,
+          direction: Axis.horizontal,
+          allowHalfRating: true,
+          itemCount: 5,
+          itemSize: 30.0,
+          itemBuilder: (context, _) => const Icon(
+            Icons.star,
+            color: Colors.amber,
           ),
-          child: RatingBar.builder(
-            initialRating: currentRating,
-            minRating: 0.5,
-            direction: Axis.horizontal,
-            allowHalfRating: true,
-            itemCount: 5,
-            itemSize: 30.0,
-            itemBuilder: (context, _) => Icon(
-              Icons.star,
-              color: isStarRated ? Colors.amber : Colors.grey,
-            ),
-            onRatingUpdate: (rating) {
-              print(rating);
-              setState(() {
-                currentRating = rating;
-                isStarRated = true;
-              });
-              _saveRating(currentRating);
-            },
-          ),
+          onRatingUpdate: (rating) {
+            setState(() {
+              currentRating = rating;
+              isStarRated = true;
+            });
+            _saveRating(currentRating);
+          },
         ),
       ),
     );
@@ -287,7 +285,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     var apiKey = dotenv.env['GOOGLE_API_KEY'];
     final encodedAddress = Uri.encodeComponent(address);
     final marker = 'markers=color:red%7Clabel:A%7C$encodedAddress';
-    const zoom = '20';
+    const zoom = '18';
     const size = '1000x1000';
 
     return 'https://maps.googleapis.com/maps/api/staticmap?center=$encodedAddress&zoom=$zoom&size=$size&$marker&key=$apiKey';
@@ -310,8 +308,33 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     }
   }
 
-  void _saveRating(double rating) {
-    // save rating logic
+  void _saveRating(double rating) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.credentials == null) {
+      authProvider.loginAction(context);
+    }
+    final String accessToken = authProvider.credentials!.accessToken;
+
+    ReviewRatingService reviewRatingService =
+        ReviewRatingService(accessToken: accessToken);
+
+    if (rating == 0.0) {
+      try {
+        await reviewRatingService.createRating(
+            widget.restaurantDetail.id, "restaurant", rating);
+      } catch (e) {
+        await reviewRatingService.updateRating(
+            widget.restaurantDetail.id, rating);
+      }
+    } else {
+      try {
+        await reviewRatingService.updateRating(
+            widget.restaurantDetail.id, rating);
+      } catch (e) {
+        await reviewRatingService.createRating(
+            widget.restaurantDetail.id, "restaurant", rating);
+      }
+    }
   }
 
   void onTapImgArrowLeft(BuildContext context) {

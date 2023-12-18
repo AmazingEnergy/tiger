@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/widgets/recipe_ingredients.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/widgets/recipe_instructions.dart';
+import 'package:tabletalk_mobile/services/review_rating_service.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final RecipeDetail recipeDetail;
@@ -17,13 +20,14 @@ class RecipeDetailScreen extends StatefulWidget {
 class RecipeDetailScreenState extends State<RecipeDetailScreen>
     with TickerProviderStateMixin {
   late TabController tabviewController;
-  double currentRating = 0.0;
+  late double currentRating;
   bool isStarRated = false;
 
   @override
   void initState() {
     super.initState();
     tabviewController = TabController(length: 2, vsync: this);
+    currentRating = widget.recipeDetail.inAppRating;
   }
 
   @override
@@ -169,43 +173,32 @@ class RecipeDetailScreenState extends State<RecipeDetailScreen>
   }
 
   Widget _buildRatingBar() {
-    return Positioned(
-      top: 16.0,
-      right: 16.0,
-      child: GestureDetector(
-        onVerticalDragDown: (details) {
-          setState(() {
-            currentRating = 0.0;
-            isStarRated = false;
-          });
-          _saveRating(currentRating);
-        },
-        child: Container(
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20.0),
+    return Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: RatingBar.builder(
+          initialRating: currentRating,
+          minRating: 1,
+          direction: Axis.horizontal,
+          allowHalfRating: true,
+          itemCount: 5,
+          itemSize: 30.0,
+          itemBuilder: (context, _) => const Icon(
+            Icons.star,
+            color: Colors.amber,
           ),
-          child: RatingBar.builder(
-            initialRating: currentRating,
-            minRating: 0.5,
-            direction: Axis.horizontal,
-            allowHalfRating: true,
-            itemCount: 5,
-            itemSize: 30.0,
-            itemBuilder: (context, _) => Icon(
-              Icons.star,
-              color: isStarRated ? Colors.amber : Colors.grey,
-            ),
-            onRatingUpdate: (rating) {
-              print(rating);
-              setState(() {
-                currentRating = rating;
-                isStarRated = true;
-              });
-              _saveRating(currentRating);
-            },
-          ),
+          onRatingUpdate: (rating) {
+            setState(() {
+              currentRating = rating;
+              isStarRated = true;
+            });
+            _saveRating(currentRating);
+          },
         ),
       ),
     );
@@ -235,8 +228,31 @@ class RecipeDetailScreenState extends State<RecipeDetailScreen>
     );
   }
 
-  void _saveRating(double rating) {
-    // Add logic here to save the rating
+  void _saveRating(double rating) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.credentials == null) {
+      authProvider.loginAction(context);
+    }
+    final String accessToken = authProvider.credentials!.accessToken;
+
+    ReviewRatingService reviewRatingService =
+        ReviewRatingService(accessToken: accessToken);
+
+    if (rating == 0.0) {
+      try {
+        await reviewRatingService.createRating(
+            widget.recipeDetail.id, "recipe", rating);
+      } catch (e) {
+        await reviewRatingService.updateRating(widget.recipeDetail.id, rating);
+      }
+    } else {
+      try {
+        await reviewRatingService.updateRating(widget.recipeDetail.id, rating);
+      } catch (e) {
+        await reviewRatingService.createRating(
+            widget.recipeDetail.id, "recipe", rating);
+      }
+    }
   }
 
   /// Navigates back to the previous screen.

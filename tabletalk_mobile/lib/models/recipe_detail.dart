@@ -6,6 +6,7 @@ class RecipeDetail {
   final String imageUrl;
   final List<String> ingredients;
   final List<Instruction> instructions;
+  final double inAppRating;
 
   RecipeDetail({
     required this.id,
@@ -15,6 +16,7 @@ class RecipeDetail {
     required this.imageUrl,
     required this.ingredients,
     required this.instructions,
+    required this.inAppRating,
   });
 
   factory RecipeDetail.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,9 @@ class RecipeDetail {
       imageUrl: json['imageUrl'] ?? '',
       ingredients: List<String>.from(json['ingredients'] ?? []),
       instructions: _parseInstructions(json['instructions']),
+      inAppRating: json['inAppRating'] != null
+          ? double.parse(json['inAppRating'].toString())
+          : 0.0,
     );
   }
 

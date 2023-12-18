@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/utils/size_utils.dart';
@@ -9,6 +9,12 @@ import 'package:tabletalk_mobile/models/simple_rating_model.dart';
 import 'package:tabletalk_mobile/screens/history_screen/widgets/history_review_rating_item.dart';
 import 'package:tabletalk_mobile/services/review_rating_service.dart';
 import 'package:provider/provider.dart';
+import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
+import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
+import 'package:tabletalk_mobile/services/recipe_data_service.dart';
+import 'package:tabletalk_mobile/services/restaurant_data_serivce.dart';
+import 'package:tabletalk_mobile/models/recipe_detail.dart';
+import 'package:tabletalk_mobile/models/restaurant_detail.dart';
 
 class HistoryReviewRatingScreen extends StatefulWidget {
   late List<SimpleRatingModel> ratings;
@@ -64,10 +70,16 @@ class HistoryReviewRatingScreenState extends State<HistoryReviewRatingScreen>
                         widget.ratings.length,
                         (index) => Column(
                           children: [
+                            SizedBox(height: 20.v),
                             HistoryReviewRatingItem(
                               rating: widget.ratings[index],
                               onRatingUpdated: refreshRatings,
+                              navigateToRecipeDetail: (id) =>
+                                  goToRecipeDetailScreen(context, id),
+                              navigateToRestaurantDetail: (id) =>
+                                  goToRestaurantDetailScreen(context, id),
                             ),
+                            SizedBox(height: 10.v),
                             SizedBox(
                               width: 335.h,
                               child: Divider(
@@ -85,6 +97,76 @@ class HistoryReviewRatingScreenState extends State<HistoryReviewRatingScreen>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Future<RecipeDetail> getRecipeDetails(
+      BuildContext context, String recipeId) async {
+    final capturedContext = context;
+    RecipeDetail recipeDetail;
+    final authProvider =
+        Provider.of<AuthProvider>(capturedContext, listen: false);
+    if (authProvider.credentials != null) {
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      RecipeDataService recipeDataService =
+          RecipeDataService(accessToken: accessToken);
+
+      recipeDetail = await recipeDataService.fetchRecipeDetails(recipeId);
+    } else {
+      throw Exception('Failed to load data');
+    }
+
+    return recipeDetail;
+  }
+
+  void goToRecipeDetailScreen(BuildContext context, String recipeId) async {
+    RecipeDetail recipeDetail = await getRecipeDetails(context, recipeId);
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecipeDetailScreen(
+          recipeDetail: recipeDetail,
+        ),
+      ),
+    );
+  }
+
+  Future<RestaurantDetail> getRestaurantDetails(
+      BuildContext context, String restaurantId) async {
+    final capturedContext = context;
+    RestaurantDetail restaurantDetail;
+    final authProvider =
+        Provider.of<AuthProvider>(capturedContext, listen: false);
+    if (authProvider.credentials != null) {
+      final String accessToken = authProvider.credentials!.accessToken;
+
+      RestaurantDataService restaurantDataService =
+          RestaurantDataService(accessToken: accessToken);
+
+      restaurantDetail =
+          await restaurantDataService.fetchRestaurantDetails(restaurantId);
+    } else {
+      throw Exception('Failed to load data');
+    }
+
+    return restaurantDetail;
+  }
+
+  void goToRestaurantDetailScreen(
+      BuildContext context, String restaurantId) async {
+    RestaurantDetail restaurantDetail =
+        await getRestaurantDetails(context, restaurantId);
+
+    // ignore: use_build_context_synchronously
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RestaurantDetailScreen(
+          restaurantDetail: restaurantDetail,
         ),
       ),
     );
