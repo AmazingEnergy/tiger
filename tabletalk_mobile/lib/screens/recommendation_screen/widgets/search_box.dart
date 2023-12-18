@@ -10,10 +10,10 @@ class SearchBox extends StatelessWidget {
   final String defaultText;
 
   SearchBox({
-    Key? key,
+    super.key,
     this.onSearch,
     required this.defaultText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

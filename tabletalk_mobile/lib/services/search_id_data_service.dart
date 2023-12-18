@@ -24,8 +24,7 @@ class SearchIdDataService {
 
       return searchIdModel;
     } else {
-      throw Exception(
-          'Failed to load data. Error code: ${response.statusCode}');
+      throw Exception('Failed to load data. Error code: ${response.body}');
     }
   }
 

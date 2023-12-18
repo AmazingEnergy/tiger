@@ -46,8 +46,7 @@ class ReviewRatingService {
     );
 
     if (response.statusCode != 200) {
-      throw Exception(
-          'Failed to create rating. Error code: ${response.statusCode}');
+      throw Exception('Failed to create rating. Error code: ${response.body}');
     }
   }
 
@@ -64,8 +63,7 @@ class ReviewRatingService {
     );
 
     if (response.statusCode != 200) {
-      throw Exception(
-          'Failed to update rating. Error code: ${response.statusCode}');
+      throw Exception('Failed to update rating. Error code: ${response.body}');
     }
   }
 }

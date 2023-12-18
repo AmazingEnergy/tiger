@@ -13,9 +13,16 @@ import 'package:tabletalk_mobile/services/review_rating_service.dart';
 class HistoryReviewRatingItem extends StatelessWidget {
   final SimpleRatingModel rating;
   final VoidCallback onRatingUpdated;
+  final Function(String) navigateToRecipeDetail;
+  final Function(String) navigateToRestaurantDetail;
 
-  const HistoryReviewRatingItem(
-      {super.key, required this.rating, required this.onRatingUpdated});
+  const HistoryReviewRatingItem({
+    super.key,
+    required this.rating,
+    required this.onRatingUpdated,
+    required this.navigateToRecipeDetail,
+    required this.navigateToRestaurantDetail,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,38 +30,47 @@ class HistoryReviewRatingItem extends StatelessWidget {
         ? getImageUrl(rating.imageUrl)
         : rating.imageUrl;
 
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 5.v),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(imageUrl),
-            radius: 25.h,
-          ),
-          SizedBox(width: 8.h),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "${rating.name} - ${rating.rateFor.string}",
-                  style: CustomTextStyles.labelLargeGray800,
-                ),
-                CustomRatingBar(
-                  initialRating: rating.rating,
-                  viewOnly: true,
-                ),
-              ],
+    return InkWell(
+      onTap: () {
+        if (rating.rateFor == RateFor.recipe) {
+          navigateToRecipeDetail(rating.referenceId);
+        } else if (rating.rateFor == RateFor.restaurant) {
+          navigateToRestaurantDetail(rating.referenceId);
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 5.v),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage(imageUrl),
+              radius: 25.h,
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              _showRatingEditDialog(context, rating);
-            },
-          ),
-        ],
+            SizedBox(width: 8.h),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${rating.name} - ${rating.rateFor.string}",
+                    style: CustomTextStyles.labelLargeGray800,
+                  ),
+                  CustomRatingBar(
+                    initialRating: rating.rating,
+                    viewOnly: true,
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                _showRatingEditDialog(context, rating);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
