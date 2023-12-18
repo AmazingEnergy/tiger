@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
@@ -139,12 +141,8 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-/*       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.logoutAction(); */
-
       String searchId = await getSearchId(context, searchText);
       print(searchId);
-      // ignore: use_build_context_synchronously
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -154,6 +152,12 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
       );
+    } catch (e) {
+      final snackBar = SnackBar(
+        content: Text('Error: ${e.toString()}'),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } finally {
       setState(() {
         loading = false;

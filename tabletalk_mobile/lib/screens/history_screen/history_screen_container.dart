@@ -118,6 +118,11 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${snapshot.error.toString()}')),
+            );
+          });
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
           return HistorySearchScreen(searchHistory: snapshot.data!);
@@ -140,6 +145,11 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${snapshot.error.toString()}')),
+            );
+          });
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
           return HistoryReviewRatingScreen(ratings: snapshot.data!);

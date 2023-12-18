@@ -20,7 +20,7 @@ class UserProfileService {
       return UserProfile.fromJson(jsonData);
     } else {
       throw Exception(
-          'Failed to load user profile. Status code: ${response.statusCode}');
+          'Failed to load user profile. Status code: ${response.body}');
     }
   }
 
