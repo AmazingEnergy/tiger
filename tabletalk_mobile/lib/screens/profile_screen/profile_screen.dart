@@ -401,7 +401,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSubscribeButton() {
     return GestureDetector(
       onTap: () {
-        // Add logic for subscription
+        Navigator.pushNamed(context, AppRoutes.subscriptionScreen);
       },
       child: Container(
         width: double.infinity,

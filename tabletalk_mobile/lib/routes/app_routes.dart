@@ -9,6 +9,7 @@ import 'package:tabletalk_mobile/screens/screens_container/screens_container.dar
 import 'package:tabletalk_mobile/screens/start_screen/start_screen.dart';
 import 'package:tabletalk_mobile/screens/search_screen/search_screen.dart';
 import 'package:tabletalk_mobile/screens/recommendation_screen/recommendation_screen.dart';
+import 'package:tabletalk_mobile/screens/subscription_screen/subscription_screen.dart';
 
 class AppRoutes {
   static const String startScreen = '/start_screen';
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String restaurantDetailScreen = '/restaurant_detail_screen';
   static const String profileScreen = '/profile_screen';
   static const String historyScreen = '/history_screen_container';
+  static const String subscriptionScreen = '/subscription_screen';
 
   static Map<String, WidgetBuilder> routes = {
     startScreen: (context) => const StartScreen(),
@@ -46,5 +48,6 @@ class AppRoutes {
     },
     profileScreen: (context) => const ProfileScreen(),
     historyScreen: (context) => const HistoryScreenContainer(),
+    subscriptionScreen: (context) => SubscriptionScreen(),
   };
 }
