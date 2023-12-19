@@ -23,6 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditing = false;
   bool _isLoading = true;
   late UserProfile userProfile;
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
@@ -52,6 +53,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       UserProfileService userProfileService =
           UserProfileService(accessToken: accessToken);
       userProfile = await userProfileService.getProfile();
+
+      setState(() {
+        _emailController.text = userProfile.email ?? '';
+      });
+
       _updateTextControllers();
     } catch (e) {
       if (kDebugMode) {
@@ -141,6 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               if (!isProMember) _buildSubscribeButton(),
               const SizedBox(height: 20),
+              _buildProfileField("Email", _emailController, isEmail: true),
               _buildProfileField("Full Name", _fullNameController),
               _buildProfileField("Address", _addressController),
               _buildProfileField("Nationality", _nationalityController),
@@ -149,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildProfileField("Bio", _bioController),
               _buildProfileField("Favorite Meals", _favoriteMealsController),
               _buildProfileField("Hate Meals", _hateMealsController),
-              _buildProfileField("Eating Habits", _eatingHabitsController,
+              _buildProfileField("Meals per day", _eatingHabitsController,
                   isDropList: true),
               const SizedBox(height: 20),
               // Save/Edit and Logout Buttons
@@ -298,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileField(String label, TextEditingController controller,
-      {bool isDropList = false}) {
+      {bool isDropList = false, bool isEmail = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -312,20 +319,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        if (!isDropList || !_isEditing)
-          CustomTextFormField(
-            controller: controller,
-            hintText: controller.text,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            borderDecoration: OutlineInputBorder(
+        if (!isDropList || (!_isEditing && !isEmail))
+          Container(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: appTheme.blueGray100,
-                width: 2,
-              ),
+              color: isEmail ? Colors.grey[200] : Colors.white,
             ),
-            enabled: _isEditing,
+            child: TextFormField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: controller.text,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: isEmail ? Colors.grey : appTheme.blueGray100,
+                    width: 2,
+                  ),
+                ),
+              ),
+              enabled: _isEditing && !isEmail,
+            ),
           ),
         if (isDropList && _isEditing)
           Row(
