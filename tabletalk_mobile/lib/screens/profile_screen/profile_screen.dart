@@ -135,17 +135,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildProfileImage(isProMember),
               const SizedBox(height: 20),
               if (isProMember)
-                // Row(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [
-                //     _buildGradientIcon(),
-                //     const SizedBox(width: 4),
-                //     _buildProText(),
-                //     const SizedBox(width: 4),
-                //     _buildGradientIcon(),
-                //   ],
-                // ),
-                if (!isProMember) _buildSubscribeButton(),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildGradientIcon(),
+                    const SizedBox(width: 4),
+                    _buildProText(),
+                    const SizedBox(width: 4),
+                    _buildGradientIcon(),
+                  ],
+                ),
+              if (!isProMember) _buildSubscribeButton(),
               const SizedBox(height: 20),
               _buildProfileField("Email", _emailController, isEmail: true),
               _buildProfileField("Full Name", _fullNameController),
@@ -255,82 +255,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
       alignment: Alignment.center,
       children: [
         Container(
-          width: 140,
-          height: 140,
+          width: 120,
+          height: 120,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: isProMember
-                ? Border.all(
-                    width: 2,
-                    color: const Color(0xFFFF9C09),
-                  )
-                : null,
+            border: Border.all(
+              color: appTheme.blueGray100,
+              width: 2,
+            ),
             image: DecorationImage(
               fit: BoxFit.fill,
               image: NetworkImage(getImageFromAuthProvider()),
             ),
           ),
         ),
-        if (isProMember)
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              width: 45,
-              height: 45,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFFF9C09),
-                    Color(0xFFFF8A00),
-                    Color(0xFFFB002A)
-                  ],
-                ),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.auto_awesome,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
       ],
     );
   }
 
-  // Widget _buildProText() {
-  //   return ShaderMask(
-  //     shaderCallback: (bounds) => const LinearGradient(
-  //       colors: [
-  //         Color.fromARGB(255, 242, 7, 7),
-  //         Color.fromARGB(255, 255, 120, 2)
-  //       ],
-  //     ).createShader(bounds),
-  //     child: const Text(
-  //       'PRO',
-  //       style: TextStyle(
-  //         color: Colors.white,
-  //         fontSize: 22,
-  //         fontWeight: FontWeight.bold,
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildProText() {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color.fromARGB(255, 242, 7, 7),
+          Color.fromARGB(255, 255, 120, 2)
+        ],
+      ).createShader(bounds),
+      child: const Text(
+        'PRO',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 
-  // Widget _buildGradientIcon() {
-  //   return ShaderMask(
-  //     shaderCallback: (bounds) => const LinearGradient(
-  //       colors: [
-  //         Color.fromARGB(255, 242, 7, 7),
-  //         Color.fromARGB(255, 255, 120, 2)
-  //       ],
-  //     ).createShader(bounds),
-  //     child: const Icon(Icons.auto_awesome, color: Colors.white, size: 35),
-  //   );
-  // }
+  Widget _buildGradientIcon() {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color.fromARGB(255, 242, 7, 7),
+          Color.fromARGB(255, 255, 120, 2)
+        ],
+      ).createShader(bounds),
+      child: const Icon(Icons.auto_awesome, color: Colors.white, size: 35),
+    );
+  }
 
   Widget _buildProfileField(String label, TextEditingController controller,
       {bool isDropList = false, bool isEmail = false}) {
