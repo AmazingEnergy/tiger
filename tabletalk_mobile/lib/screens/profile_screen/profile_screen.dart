@@ -34,6 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       TextEditingController();
   final TextEditingController _hateMealsController = TextEditingController();
   final TextEditingController _eatingHabitsController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -130,45 +131,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildProfileImage(isProMember),
-              const SizedBox(height: 20),
-              if (isProMember)
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildProfileImage(isProMember),
+                const SizedBox(height: 20),
+                if (isProMember)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildGradientIcon(),
+                      const SizedBox(width: 4),
+                      _buildProText(),
+                      const SizedBox(width: 4),
+                      _buildGradientIcon(),
+                    ],
+                  ),
+                if (!isProMember) _buildSubscribeButton(),
+                const SizedBox(height: 20),
+                _buildProfileField("Email", _emailController, isEmail: true),
+                _buildProfileField("Full Name", _fullNameController),
+                _buildProfileField("Address", _addressController),
+                _buildProfileField("Nationality", _nationalityController,
+                    isDropList: true),
+                _buildProfileField("Country", _countryController,
+                    isDropList: true),
+                _buildProfileField("Bio", _bioController),
+                _buildProfileField("Favorite Meals", _favoriteMealsController),
+                _buildProfileField("Hate Meals", _hateMealsController),
+                _buildProfileField("Meals per day", _eatingHabitsController,
+                    isDropList: true),
+                const SizedBox(height: 20),
+                // Save/Edit and Logout Buttons
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildGradientIcon(),
-                    const SizedBox(width: 4),
-                    _buildProText(),
-                    const SizedBox(width: 4),
-                    _buildGradientIcon(),
-                  ],
-                ),
-              if (!isProMember) _buildSubscribeButton(),
-              const SizedBox(height: 20),
-              _buildProfileField("Email", _emailController, isEmail: true),
-              _buildProfileField("Full Name", _fullNameController),
-              _buildProfileField("Address", _addressController),
-              _buildProfileField("Nationality", _nationalityController),
-              _buildProfileField("Country", _countryController,
-                  isDropList: true),
-              _buildProfileField("Bio", _bioController),
-              _buildProfileField("Favorite Meals", _favoriteMealsController),
-              _buildProfileField("Hate Meals", _hateMealsController),
-              _buildProfileField("Meals per day", _eatingHabitsController,
-                  isDropList: true),
-              const SizedBox(height: 20),
-              // Save/Edit and Logout Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (_isEditing)
+                    if (_isEditing)
+                      CustomElevatedButton(
+                        height: 50,
+                        width: 100,
+                        text: "Cancel",
+                        buttonTextStyle: const TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          fontSize: 15,
+                        ),
+                        buttonStyle: CustomButtonStyles.none,
+                        decoration: CustomButtonStyles
+                            .gradientPrimaryToOnPrimaryContainerDecoration,
+                        onPressed: _cancelEdit,
+                      ),
                     CustomElevatedButton(
                       height: 50,
                       width: 100,
-                      text: "Cancel",
+                      text: _isEditing ? "Save" : "Edit",
                       buttonTextStyle: const TextStyle(
                         color: Color.fromARGB(255, 255, 255, 255),
                         fontSize: 15,
@@ -176,45 +193,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buttonStyle: CustomButtonStyles.none,
                       decoration: CustomButtonStyles
                           .gradientPrimaryToOnPrimaryContainerDecoration,
-                      onPressed: _cancelEdit,
+                      onPressed: () {
+                        if (_isEditing) {
+                          _saveProfileChanges(context);
+                        } else {
+                          _toggleEditing();
+                        }
+                      },
                     ),
-                  CustomElevatedButton(
-                    height: 50,
-                    width: 100,
-                    text: _isEditing ? "Save" : "Edit",
-                    buttonTextStyle: const TextStyle(
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontSize: 15,
+                    CustomElevatedButton(
+                      height: 50,
+                      width: 100,
+                      text: "Logout",
+                      buttonTextStyle: const TextStyle(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 15,
+                      ),
+                      buttonStyle: CustomButtonStyles.none,
+                      decoration: CustomButtonStyles
+                          .gradientPrimaryToOnPrimaryContainerDecoration,
+                      onPressed: () {
+                        _logout(context);
+                      },
                     ),
-                    buttonStyle: CustomButtonStyles.none,
-                    decoration: CustomButtonStyles
-                        .gradientPrimaryToOnPrimaryContainerDecoration,
-                    onPressed: () {
-                      if (_isEditing) {
-                        _saveProfileChanges(context);
-                      } else {
-                        _toggleEditing();
-                      }
-                    },
-                  ),
-                  CustomElevatedButton(
-                    height: 50,
-                    width: 100,
-                    text: "Logout",
-                    buttonTextStyle: const TextStyle(
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontSize: 15,
-                    ),
-                    buttonStyle: CustomButtonStyles.none,
-                    decoration: CustomButtonStyles
-                        .gradientPrimaryToOnPrimaryContainerDecoration,
-                    onPressed: () {
-                      _logout(context);
-                    },
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -341,6 +346,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               enabled: _isEditing && !isEmail,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
             ),
           ),
         if (isDropList && _isEditing)
@@ -350,7 +361,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: label == "Country"
                     ? _buildCountryDropdown(controller)
-                    : _buildEatingHabitsDropdown(controller),
+                    : (label == "Nationality"
+                        ? _buildNationalityDropdown(controller)
+                        : _buildEatingHabitsDropdown(controller)),
               ),
             ],
           ),
@@ -395,6 +408,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           controller.text = newValue!;
         });
+      },
+    );
+  }
+
+  Widget _buildNationalityDropdown(TextEditingController controller) {
+    return DropdownButtonFormField<String>(
+      value: controller.text.isEmpty ? null : controller.text,
+      items: const [
+        DropdownMenuItem(value: "", child: Text("Select Nationality")),
+        DropdownMenuItem(value: "Vietnamese", child: Text("Vietnamese")),
+        DropdownMenuItem(value: "Korean", child: Text("Korean")),
+      ],
+      onChanged: (String? newValue) {
+        setState(() {
+          controller.text = newValue!;
+        });
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please select a nationality';
+        }
+        return null;
       },
     );
   }
@@ -450,48 +485,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _saveProfileChanges(BuildContext context) async {
-    try {
-      UserProfile updatedProfile = UserProfile(
-        id: userProfile.id,
-        accountId: userProfile.accountId,
-        fullName: _fullNameController.text,
-        email: userProfile.email,
-        phone: userProfile.phone,
-        address: _addressController.text,
-        nationality: _nationalityController.text,
-        country: _countryController.text,
-        bio: _bioController.text,
-        favoriteMeals: _favoriteMealsController.text,
-        hateMeals: _hateMealsController.text,
-        eatingHabits: _eatingHabitsController.text,
-        membership: userProfile.membership,
-        searchCount: userProfile.searchCount,
-      );
+    if (_formKey.currentState!.validate()) {
+      try {
+        UserProfile updatedProfile = UserProfile(
+          id: userProfile.id,
+          accountId: userProfile.accountId,
+          fullName: _fullNameController.text,
+          email: userProfile.email,
+          phone: userProfile.phone,
+          address: _addressController.text,
+          nationality: _nationalityController.text,
+          country: _countryController.text,
+          bio: _bioController.text,
+          favoriteMeals: _favoriteMealsController.text,
+          hateMeals: _hateMealsController.text,
+          eatingHabits: _eatingHabitsController.text,
+          membership: userProfile.membership,
+          searchCount: userProfile.searchCount,
+        );
 
-      print(updatedProfile.country);
-      print(updatedProfile.eatingHabits);
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      if (authProvider.credentials == null) {
-        authProvider.loginAction(context);
-        return;
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        if (authProvider.credentials == null) {
+          authProvider.loginAction(context);
+          return;
+        }
+        final String accessToken = authProvider.credentials!.accessToken;
+
+        UserProfileService userProfileService =
+            UserProfileService(accessToken: accessToken);
+        await userProfileService.updateProfile(userProfile.id, updatedProfile);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Update successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        setState(() {
+          userProfile = updatedProfile;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Update failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isEditing = false;
+        });
       }
-      final String accessToken = authProvider.credentials!.accessToken;
-
-      UserProfileService userProfileService =
-          UserProfileService(accessToken: accessToken);
-      await userProfileService.updateProfile(userProfile.id, updatedProfile);
-
-      setState(() {
-        userProfile = updatedProfile;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error updating user profile: $e');
-      }
-    } finally {
-      setState(() {
-        _isEditing = false;
-      });
     }
   }
 
