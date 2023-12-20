@@ -62,12 +62,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       if (kDebugMode) {
         print('Payment successful');
       }
-
-      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Payment Success"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      Navigator.of(context).pop(true);
     } catch (e) {
-      if (kDebugMode) {
-        print('Error: $e');
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("The payment flow has been canceled"),
+            backgroundColor: Colors.black,
+            duration: Duration(seconds: 3)),
+      );
     }
   }
 

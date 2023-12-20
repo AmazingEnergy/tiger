@@ -322,7 +322,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
     RestaurantDetail restaurantDetail =
         await getRestaurantDetails(context, restaurantId);
 
-    // ignore: use_build_context_synchronously
     await Navigator.push(
       context,
       MaterialPageRoute(

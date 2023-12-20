@@ -7,6 +7,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/profile_model.dart';
 import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/screens/subscription_screen/subscription_screen.dart';
 import 'package:tabletalk_mobile/services/user_profile_service.dart';
 import 'package:tabletalk_mobile/widgets/custom_elevated_button.dart';
 import 'package:tabletalk_mobile/widgets/custom_text_form_field.dart';
@@ -400,8 +401,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildSubscribeButton() {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, AppRoutes.subscriptionScreen);
+      onTap: () async {
+        final bool? refreshNeeded = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SubscriptionScreen(),
+          ),
+        );
+
+        if (refreshNeeded ?? false) {
+          _loadUserProfile();
+        }
       },
       child: Container(
         width: double.infinity,
@@ -488,7 +498,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _logout(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.logoutAction();
-    // ignore: use_build_context_synchronously
     Navigator.pushReplacementNamed(context, AppRoutes.startScreen);
   }
 
