@@ -40,10 +40,9 @@ class HistoryReviewRatingScreenState extends State<HistoryReviewRatingScreen>
       List<SimpleRatingModel> updatedRatings =
           await reviewRatingService.fetchReviewRatings();
       setState(() {
-        widget.ratings = updatedRatings; // Update the ratings list
+        widget.ratings = updatedRatings;
       });
     } catch (e) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to refresh ratings: $e")));
     }
@@ -161,7 +160,6 @@ class HistoryReviewRatingScreenState extends State<HistoryReviewRatingScreen>
     RestaurantDetail restaurantDetail =
         await getRestaurantDetails(context, restaurantId);
 
-    // ignore: use_build_context_synchronously
     await Navigator.push(
       context,
       MaterialPageRoute(

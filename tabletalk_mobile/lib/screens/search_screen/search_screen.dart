@@ -142,7 +142,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     try {
       String searchId = await getSearchId(context, searchText);
-      print(searchId);
+
       await Navigator.push(
         context,
         MaterialPageRoute(

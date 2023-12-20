@@ -7,6 +7,7 @@ import 'package:tabletalk_mobile/core/app_export.dart';
 import 'package:tabletalk_mobile/models/search_history_model.dart';
 import 'package:tabletalk_mobile/models/search_id_model.dart';
 import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/screens/recommendation_screen/recommendation_screen.dart';
 import 'package:tabletalk_mobile/services/search_id_data_service.dart';
 
 class HistorySearchItem extends StatelessWidget {
@@ -74,10 +75,11 @@ class HistorySearchItem extends StatelessWidget {
     );
   }
 
-  void _showDetailDialog(BuildContext context, SearchIdDetailModel detail) {
+  void _showDetailDialog(
+      BuildContext parentContext, SearchIdDetailModel detail) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
+      context: parentContext,
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text("Search Result Details"),
           content: SingleChildScrollView(
@@ -105,9 +107,24 @@ class HistorySearchItem extends StatelessWidget {
           ),
           actions: <Widget>[
             TextButton(
+              child: const Text("View Recommendations"),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                Navigator.push(
+                  parentContext,
+                  MaterialPageRoute(
+                    builder: (context) => RecommendScreen(
+                      searchText: detail.searchText,
+                      searchId: detail.id,
+                    ),
+                  ),
+                );
+              },
+            ),
+            TextButton(
               child: const Text("Close"),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
             ),
           ],

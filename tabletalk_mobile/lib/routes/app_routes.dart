@@ -48,6 +48,6 @@ class AppRoutes {
     },
     profileScreen: (context) => const ProfileScreen(),
     historyScreen: (context) => const HistoryScreenContainer(),
-    subscriptionScreen: (context) => SubscriptionScreen(),
+    subscriptionScreen: (context) => const SubscriptionScreen(),
   };
 }
