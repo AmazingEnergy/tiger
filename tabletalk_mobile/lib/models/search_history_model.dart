@@ -16,3 +16,6 @@ class SearchHistoryModel {
         time: json['createdAt'] ?? '');
   }
 }
+//5f3ce52d-ac07-4f49-bc7e-c3487b7be8dc
+//5f3ce52d-ac07-4f49-bc7e-c3487b7be8dc
+//id == searchId

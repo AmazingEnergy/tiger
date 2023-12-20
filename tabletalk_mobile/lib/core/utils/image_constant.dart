@@ -15,6 +15,9 @@ class ImageConstant {
   static String imgStar = '$imagePath/img_star.svg';
   static String imageNotFound = '$imagePath/image_not_found.png';
 
+  //subscription screen image
+  static String imgSubscription = '$imagePath/subscription.png';
+
   // Additional images from the second class
   static String imgIconGeneralArrowright =
       '$imagePath/img_icon_general_arrowright.svg';

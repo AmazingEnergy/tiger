@@ -118,6 +118,11 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${snapshot.error.toString()}')),
+            );
+          });
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
           return HistorySearchScreen(searchHistory: snapshot.data!);
@@ -140,11 +145,16 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${snapshot.error.toString()}')),
+            );
+          });
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
           return HistoryReviewRatingScreen(ratings: snapshot.data!);
         } else {
-          return const Center(child: Text('No reviews and ratings found'));
+          return const Center(child: Text('No ratings found'));
         }
       },
     );
@@ -188,7 +198,7 @@ class HistoryScreenContainerState extends State<HistoryScreenContainer>
               child: Text("Search"),
             ),
             Tab(
-              child: Text("Reviews and ratings"),
+              child: Text("Ratings"),
             ),
           ],
         ),
