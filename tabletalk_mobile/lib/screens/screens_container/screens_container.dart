@@ -67,10 +67,17 @@ class _ScreensContainerState extends State<ScreensContainer> {
     return CustomBottomBar(onChanged: (BottomBarEnum type) {
       final String newRoute = getCurrentRoute(type);
       if (navigatorKey.currentContext != null) {
-        Navigator.pushNamed(
-          navigatorKey.currentContext!,
-          newRoute,
-        );
+        if (newRoute == AppRoutes.searchScreen) {
+          Navigator.pushNamed(
+            navigatorKey.currentContext!,
+            newRoute,
+          );
+        } else if (_currentRoute != newRoute) {
+          Navigator.pushNamed(
+            navigatorKey.currentContext!,
+            newRoute,
+          );
+        }
       }
     });
   }

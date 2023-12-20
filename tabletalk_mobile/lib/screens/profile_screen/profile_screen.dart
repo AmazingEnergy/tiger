@@ -398,10 +398,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return DropdownButton<String>(
       value: controller.text,
       items: List<DropdownMenuItem<String>>.generate(
-        9,
+        8,
         (index) => DropdownMenuItem(
-          value: (index).toString(),
-          child: Text((index).toString()),
+          value: (index + 1).toString(),
+          child: Text((index + 1).toString()),
         ),
       ),
       onChanged: (String? newValue) {
