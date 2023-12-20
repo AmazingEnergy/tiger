@@ -1,12 +1,76 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:provider/provider.dart';
+import 'package:tabletalk_mobile/providers/auth_provider.dart';
+import 'package:tabletalk_mobile/services/payment_service.dart';
 import '../../core/utils/image_constant.dart';
 
 class SubscriptionScreen extends StatefulWidget {
+  const SubscriptionScreen({super.key});
+
   @override
   _SubscriptionScreenState createState() => _SubscriptionScreenState();
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
+  @override
+  void initState() {
+    super.initState();
+    initStripe();
+  }
+
+  Future<String> getAccessToken() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.credentials == null) {
+      await authProvider.loginAction(context);
+    }
+    String accessToken = authProvider.credentials!.accessToken;
+    return accessToken;
+  }
+
+  Future<void> initStripe() async {
+    try {
+      String accessToken = await getAccessToken();
+
+      var pricesData =
+          await PaymentService(accessToken: accessToken).fetchPrices();
+      Stripe.publishableKey = pricesData['publishableKey'];
+      await Stripe.instance.applySettings();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error initializing Stripe: $e');
+      }
+    }
+  }
+
+  Future<void> showStripePaymentSheet(
+      String paymentIntentSecret, String customerId) async {
+    try {
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntentSecret,
+          customerId: customerId,
+          merchantDisplayName: 'TableTalk Pay',
+          style: ThemeMode.dark,
+        ),
+      );
+      await Stripe.instance.presentPaymentSheet();
+
+      if (kDebugMode) {
+        print('Payment successful');
+      }
+
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -177,8 +241,24 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       left: 0,
       right: 0,
       child: InkWell(
-        onTap: () {
-          // logic
+        onTap: () async {
+          try {
+            String accessToken = await getAccessToken();
+            var pricesData =
+                await PaymentService(accessToken: accessToken).fetchPrices();
+            var priceId = pricesData['prices'][0]['id'];
+            var subscriptionData =
+                await PaymentService(accessToken: accessToken)
+                    .createSubscription(priceId);
+            var paymentIntentSecret = subscriptionData['paymentIntentSecret'];
+            var customerId = subscriptionData['customerId'];
+
+            await showStripePaymentSheet(paymentIntentSecret, customerId);
+          } catch (e) {
+            if (kDebugMode) {
+              print('Error: $e');
+            }
+          }
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
