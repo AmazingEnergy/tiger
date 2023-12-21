@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         print('Error loading user profile: $e');
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading user profile: ${e}')),
+        SnackBar(content: Text('Error loading user profile: $e')),
       );
     }
   }
