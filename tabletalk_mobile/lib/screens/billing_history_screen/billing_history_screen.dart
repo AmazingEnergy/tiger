@@ -18,6 +18,8 @@ class BillingHistoryScreen extends StatefulWidget {
 
 class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
   late Future<List<InvoiceModel>> _billingHistoryFuture;
+  UpcomingInvoiceModel? _upcomingInvoice;
+  ExpirationInvoiceModel? _expiredInvoice;
 
   @override
   void initState() {
@@ -33,6 +35,16 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
     final String accessToken = authProvider.credentials!.accessToken;
     _billingHistoryFuture = BillingHistoryService(accessToken: accessToken)
         .fetchBillingHistoryData();
+
+    var billingService = BillingHistoryService(accessToken: accessToken);
+
+    try {
+      _upcomingInvoice = await billingService.fetchUpcomingInvoice();
+    } catch (e) {
+      try {
+        _expiredInvoice = await billingService.cancelSubscription();
+      } catch (e) {}
+    }
   }
 
   @override
@@ -93,83 +105,62 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
     );
   }
 
-  /// Section Widget
   Widget _buildSubscriptionStatus(BuildContext context) {
+    String currentPlan;
+    String dateLabel;
+    String dateValue;
+    String total;
+
+    if (_upcomingInvoice != null) {
+      currentPlan = "Premium+";
+      dateLabel = "Next billing date";
+      dateValue = dateTimeConverter(_upcomingInvoice!.periodStartDate);
+      total =
+          "\$${_upcomingInvoice!.amount / 100} ${_upcomingInvoice!.currency}";
+    } else if (_expiredInvoice != null) {
+      currentPlan = "Premium+";
+      dateLabel = "Expiration Date";
+      dateValue = dateTimeConverter(_expiredInvoice!.periodEndDate);
+      total = "N/A";
+    } else {
+      currentPlan = "Normal";
+      dateLabel = "Status";
+      dateValue = "No active plan";
+      total = "N/A";
+    }
     return Container(
       width: 347.h,
       margin: EdgeInsets.symmetric(horizontal: 1.h),
-      padding: EdgeInsets.symmetric(
-        horizontal: 4.h,
-        vertical: 6.v,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 4.h, vertical: 6.v),
       decoration: AppDecoration.outlineGray,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: EdgeInsets.only(left: 2.h),
-            child: Text(
+            child: const Text(
               "Your Membership",
-              style: theme.textTheme.titleMedium,
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
           ),
           SizedBox(height: 8.v),
-          Container(
-            height: 39.v,
-            width: 326.h,
-            margin: EdgeInsets.only(left: 1.h),
-            child: Stack(
-              alignment: Alignment.bottomLeft,
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Text(
-                    "Current Plan           Next billing date                    Total",
-                    style: theme.textTheme.labelLarge,
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 1.v),
-                        child: Text(
-                          "Premium + ",
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 53.h),
-                        child: Text(
-                          "6 January 2024",
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 1.v),
-                    child: Text(
-                      "1.99 /month",
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildColumnWithLabelAndData("Current Plan", currentPlan),
+              _buildColumnWithLabelAndData(dateLabel, dateValue),
+              _buildColumnWithLabelAndData("Total", total),
+            ],
           ),
-          SizedBox(height: 24.v),
+          SizedBox(height: 20.v),
           CustomElevatedButton(
             height: 40.h,
             width: 150.h,
             buttonTextStyle: const TextStyle(
-              color: Color.fromARGB(255, 255, 255, 255),
-              fontSize: 12,
-            ),
+                color: Color.fromARGB(255, 255, 255, 255), fontSize: 12),
             text: "Cancel Subscription",
             buttonStyle: CustomButtonStyles.none,
             decoration: CustomButtonStyles.gradientPinkAToPinkDecoration,
@@ -179,6 +170,27 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
       ),
     );
   }
+
+  Widget _buildColumnWithLabelAndData(String label, String data) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+              color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 4.v),
+        Text(
+          data,
+          style: theme.textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
+  
 
   Widget _buildBillingHistory() {
     return FutureBuilder<List<InvoiceModel>>(
@@ -194,6 +206,32 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
           return const Text('No data available');
         }
       },
+    );
+  }
+
+  Widget _buildShimmerBox() {
+    return Container(
+      width: 347.h,
+      height: 100.h, // Approximate height of your subscription box
+      padding: EdgeInsets.all(16.h),
+      decoration: AppDecoration.outlineGray,
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(
+            5,
+            (_) => Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: Container(
+                height: 8.h,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
