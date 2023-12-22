@@ -14,13 +14,13 @@ void main() async {
   ]);
   await dotenv.load(fileName: ".env");
 
-  ThemeHelper().changeTheme('primary');
   AuthProvider authProvider = AuthProvider();
   await authProvider.loadCredentials();
 
   LocationProvider locationProvider = LocationProvider();
   await locationProvider.getCurrentLocation();
-
+  ThemeHelper().changeTheme("primary");
+  
   runApp(
     MultiProvider(
       providers: [

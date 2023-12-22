@@ -265,6 +265,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           if (kDebugMode) {
             print('Error: $e');
           }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error initializing stripe: $e')),
+          );
         }
       },
       child: Container(
