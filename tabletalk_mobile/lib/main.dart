@@ -20,7 +20,7 @@ void main() async {
   LocationProvider locationProvider = LocationProvider();
   await locationProvider.getCurrentLocation();
   ThemeHelper().changeTheme("primary");
-  
+
   runApp(
     MultiProvider(
       providers: [

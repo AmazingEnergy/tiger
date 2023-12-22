@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/models/recipe_detail.dart';
 import 'package:tabletalk_mobile/models/restaurant_detail.dart';
+import 'package:tabletalk_mobile/screens/billing_history_screen/billing_history_screen.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/recipe_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/detail_screen/restaurant_detail_screen.dart';
 import 'package:tabletalk_mobile/screens/history_screen/history_screen_container.dart';
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String profileScreen = '/profile_screen';
   static const String historyScreen = '/history_screen_container';
   static const String subscriptionScreen = '/subscription_screen';
+  static const String billingHistoryScreen = '/billing_history_screen';
 
   static Map<String, WidgetBuilder> routes = {
     startScreen: (context) => const StartScreen(),
@@ -49,5 +51,6 @@ class AppRoutes {
     profileScreen: (context) => const ProfileScreen(),
     historyScreen: (context) => const HistoryScreenContainer(),
     subscriptionScreen: (context) => const SubscriptionScreen(),
+    billingHistoryScreen: (context) => const BillingHistoryScreen(),
   };
 }

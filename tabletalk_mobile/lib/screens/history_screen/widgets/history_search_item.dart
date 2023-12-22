@@ -134,7 +134,7 @@ class HistorySearchItem extends StatelessWidget {
   }
 
   String dateTimeConverter(String str) {
-    DateTime dateTime = DateTime.parse(str);
+    DateTime dateTime = DateTime.parse(str).toLocal();
 
     String formattedDateString =
         DateFormat("yyyy/MM/dd  -  hh:mma").format(dateTime);
