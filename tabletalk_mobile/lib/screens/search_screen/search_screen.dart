@@ -120,7 +120,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 325.h,
                     ),
                     SizedBox(height: 87.v),
-                    Text('Searches today: $_searchCount'),
+                    Text(
+                        'Searches today: $_searchCount / ${_membership == 'pro' ? 10 : 2}'),
                     loading
                         ? const SizedBox.shrink()
                         : Column(
