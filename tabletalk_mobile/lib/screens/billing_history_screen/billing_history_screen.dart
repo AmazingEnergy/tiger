@@ -156,18 +156,26 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
             ],
           ),
           SizedBox(height: 20.v),
-          CustomElevatedButton(
-            height: 40.h,
-            width: 150.h,
-            buttonTextStyle: const TextStyle(
-                color: Color.fromARGB(255, 255, 255, 255), fontSize: 12),
-            text: "Cancel Subscription",
-            buttonStyle: CustomButtonStyles.none,
-            decoration: CustomButtonStyles.gradientPinkAToPinkDecoration,
-            alignment: Alignment.centerRight,
-          ),
+          if (_upcomingInvoice != null)
+            _buildActionButton("Cancel Subscription", _cancelSubscription),
+          if (_upcomingInvoice == null && _expiredInvoice == null)
+            _buildActionButton("Subscribe Now", _navigateToSubscriptionScreen),
         ],
       ),
+    );
+  }
+
+  Widget _buildActionButton(String text, VoidCallback onPressed) {
+    return CustomElevatedButton(
+      height: 40.h,
+      width: 150.h,
+      buttonTextStyle: const TextStyle(
+          color: Color.fromARGB(255, 255, 255, 255), fontSize: 12),
+      text: text,
+      buttonStyle: CustomButtonStyles.none,
+      decoration: CustomButtonStyles.gradientPinkAToPinkDecoration,
+      alignment: Alignment.centerRight,
+      onPressed: onPressed,
     );
   }
 
@@ -190,8 +198,6 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
     );
   }
 
-  
-
   Widget _buildBillingHistory() {
     return FutureBuilder<List<InvoiceModel>>(
       future: _billingHistoryFuture,
@@ -212,7 +218,7 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
   Widget _buildShimmerBox() {
     return Container(
       width: 347.h,
-      height: 100.h, // Approximate height of your subscription box
+      height: 100.h,
       padding: EdgeInsets.all(16.h),
       decoration: AppDecoration.outlineGray,
       child: Shimmer.fromColors(
@@ -272,5 +278,21 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
     String formattedDate = DateFormat('MM/dd/yy').format(dateTime);
 
     return formattedDate;
+  }
+
+  void _cancelSubscription() async {
+    var billingService = BillingHistoryService(
+        accessToken: Provider.of<AuthProvider>(context, listen: false)
+            .credentials!
+            .accessToken);
+
+    try {
+      _expiredInvoice = await billingService.cancelSubscription();
+      setState(() {});
+    } catch (e) {}
+  }
+
+  void _navigateToSubscriptionScreen() {
+    Navigator.pushNamed(context, AppRoutes.subscriptionScreen);
   }
 }
