@@ -60,4 +60,5 @@ jobs:
         with:
           artifacts: "${{ env.WORKING_DIR }}/build/app/outputs/flutter-apk/*,${{ env.WORKING_DIR }}/build/app/outputs/apk/debug/*,${{ env.WORKING_DIR }}/build/ios/iphoneos/app.ipa"
           allowUpdates: true
+          makeLatest: true
           tag: pre.${{ github.run_number }}
