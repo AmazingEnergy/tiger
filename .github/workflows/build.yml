@@ -58,6 +58,6 @@ jobs:
         uses: ncipollo/release-action@v1
         continue-on-error: true
         with:
-          artifacts: "${{ env.WORKING_DIR }}/build/app/outputs/apk/debug/*,${{ env.WORKING_DIR }}/build/ios/iphoneos/app.ipa"
+          artifacts: "${{ env.WORKING_DIR }}/build/app/outputs/flutter-apk/*,${{ env.WORKING_DIR }}/build/app/outputs/apk/debug/*,${{ env.WORKING_DIR }}/build/ios/iphoneos/app.ipa"
           allowUpdates: true
           tag: pre.${{ github.run_number }}
