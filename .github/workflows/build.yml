@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  WORKING_DIR: ./tabletalk_mobile
+
 jobs:
   build:
     name: Build & Release
@@ -20,11 +23,18 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.7.7"
-      - run: cd tabletalk_mobile
-      - run: flutter pub get
-      - run: flutter test
-      - run: flutter build apk --debug --split-per-abi
-      - run: |
+      - name: Get dependencies
+        working-directory: ${{ env.WORKING_DIR }}
+        run: flutter pub get
+      - name: Run tests
+        working-directory: ${{ env.WORKING_DIR }}
+        run: flutter test
+      - name: Build APK
+        working-directory: ${{ env.WORKING_DIR }}
+        run: flutter build apk --debug --split-per-abi
+      - name: Build IPA
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
           flutter build ios --no-codesign
           cd build/ios/iphoneos
           mkdir Payload
