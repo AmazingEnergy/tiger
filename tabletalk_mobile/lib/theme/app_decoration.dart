@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:tabletalk_mobile/core/app_export.dart';
 
 class AppDecoration {
+  // Outline decorations
+  static BoxDecoration get outlineGray => BoxDecoration(
+        border: Border.all(
+          color: appTheme.gray900,
+          width: 1.h,
+        ),
+      );
+
   // Fill decorations
   static BoxDecoration get fillOnPrimary => BoxDecoration(
         color: theme.colorScheme.onPrimary,

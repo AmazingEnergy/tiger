@@ -38,7 +38,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
   bool loading = true;
   List<RecipeSearchResult> recipes = List.empty(growable: true);
   List<RestaurantSearchResult> restaurants = List.empty(growable: true);
-  String? feedback;
+  String feedback = '';
 
   @override
   void initState() {
@@ -125,11 +125,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
       SearchIdDetailModel searchIdDetail =
           await searchIdDataService.fetchSearchIdDetail(widget.searchId);
 
-      if (kDebugMode) {
-        print('Old feedback: $feedback');
-        print('New feedback: ${searchIdDetail.feedback}');
-      }
-
       setState(() {
         feedback = searchIdDetail.feedback;
       });
@@ -195,7 +190,7 @@ class _RecommendScreenState extends State<RecommendScreen> {
                 ],
               ),
             ),
-            if (feedback == null || feedback!.isEmpty)
+            if (feedback == '')
               Positioned(
                 bottom: 16.0,
                 right: 16.0,

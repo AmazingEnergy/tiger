@@ -120,7 +120,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 325.h,
                     ),
                     SizedBox(height: 87.v),
-                    Text('Searches today: $_searchCount'),
+                    Text(
+                        'Searches today: $_searchCount / ${_membership == 'pro' ? 10 : 2}'),
                     loading
                         ? const SizedBox.shrink()
                         : Column(
@@ -129,9 +130,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 controller: askController,
                                 hintText: hintText,
                                 textInputAction: TextInputAction.done,
-                                enabled: (_membership == 'pro' &&
-                                        _searchCount < 10) ||
-                                    (_membership != 'pro' && _searchCount < 2),
+                                enabled: !isLimited,
                               ),
                               SizedBox(height: 3.v),
                               CustomElevatedButton(
@@ -141,9 +140,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                   fontSize: 15,
                                 ),
                                 text: "Submit",
-                                isDisabled: !(_membership == 'pro' &&
-                                        _searchCount < 10) ||
-                                    (_membership != 'pro' && _searchCount < 2),
+                                isDisabled: (_membership == 'pro' &&
+                                        _searchCount == 10) ||
+                                    (_membership == 'normal' &&
+                                        _searchCount == 2),
                                 onPressed: loading
                                     ? null
                                     : () {

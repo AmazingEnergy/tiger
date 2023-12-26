@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         print('Error loading user profile: $e');
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading user profile: ${e}')),
+        SnackBar(content: Text('Error loading user profile: $e')),
       );
     }
   }
@@ -116,6 +116,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          actions: <Widget>[
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, AppRoutes.billingHistoryScreen);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                alignment: Alignment.center,
+                child: const Text(
+                  'Billing History',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
         body: SafeArea(
           child: _isLoading ? _buildShimmerEffect() : _buildProfileScreen(),

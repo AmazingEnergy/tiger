@@ -29,4 +29,5 @@ class ImageConstant {
   static String imgBell = '$imagePath/img_bell.svg';
   static String imgFilter = '$imagePath/img_filter.svg';
   static String imgIicon = '$imagePath/img_i_icon.svg';
+  static String imgArrowDown = '$imagePath/img_arrow_down.svg';
 }

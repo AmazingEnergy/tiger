@@ -43,4 +43,15 @@ class CustomButtonStyles {
         backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
         elevation: MaterialStateProperty.all<double>(0),
       );
+  static BoxDecoration get gradientPinkAToPinkDecoration => BoxDecoration(
+        borderRadius: BorderRadius.circular(180.h),
+        gradient: LinearGradient(
+          begin: const Alignment(0.5, 0),
+          end: const Alignment(0.5, 1),
+          colors: [
+            appTheme.pinkA100,
+            appTheme.pink300,
+          ],
+        ),
+      );
 }

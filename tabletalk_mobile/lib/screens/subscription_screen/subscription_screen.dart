@@ -43,6 +43,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       if (kDebugMode) {
         print('Error initializing Stripe: $e');
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error initializing stripe: $e')),
+      );
     }
   }
 
@@ -95,7 +98,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                children: [
+                children: <Widget>[
                   buildSectionTop(),
                   Expanded(
                     child: buildSectionBody(),
@@ -245,47 +248,44 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Widget buildSectionBottom() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: InkWell(
-        onTap: () async {
-          try {
-            String accessToken = await getAccessToken();
-            var pricesData =
-                await PaymentService(accessToken: accessToken).fetchPrices();
-            var priceId = pricesData['prices'][0]['id'];
-            var subscriptionData =
-                await PaymentService(accessToken: accessToken)
-                    .createSubscription(priceId);
-            var paymentIntentSecret = subscriptionData['paymentIntentSecret'];
-            var customerId = subscriptionData['customerId'];
+    return InkWell(
+      onTap: () async {
+        try {
+          String accessToken = await getAccessToken();
+          var pricesData =
+              await PaymentService(accessToken: accessToken).fetchPrices();
+          var priceId = pricesData['prices'][0]['id'];
+          var subscriptionData = await PaymentService(accessToken: accessToken)
+              .createSubscription(priceId);
+          var paymentIntentSecret = subscriptionData['paymentIntentSecret'];
+          var customerId = subscriptionData['customerId'];
 
-            await showStripePaymentSheet(paymentIntentSecret, customerId);
-          } catch (e) {
-            if (kDebugMode) {
-              print('Error: $e');
-            }
+          await showStripePaymentSheet(paymentIntentSecret, customerId);
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error: $e');
           }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFD637C), Color(0xFFFF8EA1)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error initializing stripe: $e')),
+          );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFD637C), Color(0xFFFF8EA1)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          child: const Center(
-            child: Text(
-              'Subscribe Now',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
+        ),
+        child: const Center(
+          child: Text(
+            'Subscribe Now',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
             ),
           ),
         ),
