@@ -43,12 +43,6 @@ jobs:
       - name: Build APK
         working-directory: ${{ env.WORKING_DIR }}
         run: flutter build apk --debug --split-per-abi
-      - name: Push to Releases
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/apk/debug/*"
-          allowUpdates: true
-          tag: ${{ github.run_number }}
       - name: Build IPA
         working-directory: ${{ env.WORKING_DIR }}
         continue-on-error: true
@@ -64,6 +58,6 @@ jobs:
         uses: ncipollo/release-action@v1
         continue-on-error: true
         with:
-          artifacts: "build/app/outputs/apk/debug/*,build/ios/iphoneos/app.ipa"
+          artifacts: "${{ env.WORKING_DIR }}/build/app/outputs/apk/debug/*,${{ env.WORKING_DIR }}/build/ios/iphoneos/app.ipa"
           allowUpdates: true
-          tag: ${{ github.run_number }}
+          tag: pre.${{ github.run_number }}
