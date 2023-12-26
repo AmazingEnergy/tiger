@@ -42,7 +42,7 @@ jobs:
           echo "CORE_API_URL=${{ secrets.CORE_API_URL }}" >> .env
       - name: Build APK
         working-directory: ${{ env.WORKING_DIR }}
-        run: flutter build apk --debug --split-per-abi
+        run: flutter build apk
       - name: Build IPA
         working-directory: ${{ env.WORKING_DIR }}
         continue-on-error: true
