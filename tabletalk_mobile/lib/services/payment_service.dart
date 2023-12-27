@@ -6,7 +6,6 @@ class PaymentService {
 
   PaymentService({required this.accessToken});
 
-  // Fetches prices and the publishable key
   Future<Map<String, dynamic>> fetchPrices() async {
     var response = await http.get(
       Uri.parse(

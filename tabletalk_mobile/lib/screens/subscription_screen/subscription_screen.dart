@@ -16,16 +16,29 @@ class SubscriptionScreen extends StatefulWidget {
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
     initStripe();
   }
 
-  Future<String> getAccessToken() async {
+  Widget _buildLoadingOverlay() {
+    return _isLoading
+        ? Container(
+            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : const SizedBox.shrink();
+  }
+
+  String getAccessToken() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.credentials == null) {
-      await authProvider.loginAction(context);
+      authProvider.loginAction(context);
     }
     String accessToken = authProvider.credentials!.accessToken;
     return accessToken;
@@ -37,6 +50,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
       var pricesData =
           await PaymentService(accessToken: accessToken).fetchPrices();
+
       Stripe.publishableKey = pricesData['publishableKey'];
       await Stripe.instance.applySettings();
     } catch (e) {
@@ -107,6 +121,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ],
               ),
             ),
+            _buildLoadingOverlay(),
           ],
         ),
       ),
@@ -250,8 +265,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget buildSectionBottom() {
     return InkWell(
       onTap: () async {
+        setState(() {
+          _isLoading = true;
+        });
         try {
-          String accessToken = await getAccessToken();
+          String accessToken = getAccessToken();
           var pricesData =
               await PaymentService(accessToken: accessToken).fetchPrices();
           var priceId = pricesData['prices'][0]['id'];
@@ -263,11 +281,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           await showStripePaymentSheet(paymentIntentSecret, customerId);
         } catch (e) {
           if (kDebugMode) {
-            print('Error: $e');
+            print('Error initing stripe s2: $e');
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error initializing stripe: $e')),
           );
+        } finally {
+          setState(() {
+            _isLoading = false;
+          });
         }
       },
       child: Container(

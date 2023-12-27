@@ -18,13 +18,13 @@ class BillingHistoryScreen extends StatefulWidget {
 
 class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
   late Future<List<InvoiceModel>> _billingHistoryFuture;
-  UpcomingInvoiceModel? _upcomingInvoice;
-  ExpirationInvoiceModel? _expiredInvoice;
+  late Future<SubscriptionStatus> _subscriptionStatusFuture;
 
   @override
   void initState() {
     super.initState();
     _initData();
+    _subscriptionStatusFuture = _fetchSubscriptionStatus();
   }
 
   void _initData() async {
@@ -35,15 +35,49 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
     final String accessToken = authProvider.credentials!.accessToken;
     _billingHistoryFuture = BillingHistoryService(accessToken: accessToken)
         .fetchBillingHistoryData();
+  }
 
+  Future<SubscriptionStatus> _fetchSubscriptionStatus() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.credentials == null) {
+      authProvider.loginAction(context);
+    }
+    final String accessToken = authProvider.credentials!.accessToken;
+
+    await Future.delayed(const Duration(seconds: 1));
     var billingService = BillingHistoryService(accessToken: accessToken);
-
+    UpcomingInvoiceModel? _upcomingInvoice;
+    ExpirationInvoiceModel? _expiredInvoice;
     try {
       _upcomingInvoice = await billingService.fetchUpcomingInvoice();
     } catch (e) {
       try {
         _expiredInvoice = await billingService.cancelSubscription();
       } catch (e) {}
+    }
+
+    if (_upcomingInvoice != null) {
+      return SubscriptionStatus(
+        currentPlan: "Premium+",
+        dateLabel: "Next billing date",
+        dateValue: dateTimeConverter(_upcomingInvoice!.periodStartDate),
+        total:
+            "\$${_upcomingInvoice!.amount / 100} ${_upcomingInvoice!.currency}",
+      );
+    } else if (_expiredInvoice != null) {
+      return SubscriptionStatus(
+        currentPlan: "Premium+",
+        dateLabel: "Expiration Date",
+        dateValue: dateTimeConverter(_expiredInvoice!.periodEndDate),
+        total: "N/A",
+      );
+    } else {
+      return SubscriptionStatus(
+        currentPlan: "Normal",
+        dateLabel: "Status",
+        dateValue: "No active plan",
+        total: "N/A",
+      );
     }
   }
 
@@ -57,8 +91,8 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
           child: Column(
             children: [
               _buildHeader(context),
-              SizedBox(height: 19.v),
-              _buildSubscriptionStatus(context),
+              SizedBox(height: 30.v),
+              _buildSubscriptionStatus(),
               SizedBox(height: 19.v),
               _buildBillingHistory(),
               SizedBox(height: 5.v),
@@ -70,98 +104,76 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: 10.h,
-          right: 83.h,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                left: 71.h,
-                top: 19.v,
-              ),
-              child: Text(
-                "History",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.h,
-                    color: const Color.fromARGB(255, 191, 27, 82)),
-              ),
-            ),
-          ],
+    return AppBar(
+      backgroundColor: Colors.white,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      title: const Text(
+        "Billing History",
+        style: TextStyle(
+          color: Color(0xFFFD637C),
+          fontSize: 24,
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.bold,
         ),
       ),
+      elevation: 0,
     );
   }
 
-  Widget _buildSubscriptionStatus(BuildContext context) {
-    String currentPlan;
-    String dateLabel;
-    String dateValue;
-    String total;
-
-    if (_upcomingInvoice != null) {
-      currentPlan = "Premium+";
-      dateLabel = "Next billing date";
-      dateValue = dateTimeConverter(_upcomingInvoice!.periodStartDate);
-      total =
-          "\$${_upcomingInvoice!.amount / 100} ${_upcomingInvoice!.currency}";
-    } else if (_expiredInvoice != null) {
-      currentPlan = "Premium+";
-      dateLabel = "Expiration Date";
-      dateValue = dateTimeConverter(_expiredInvoice!.periodEndDate);
-      total = "N/A";
-    } else {
-      currentPlan = "Normal";
-      dateLabel = "Status";
-      dateValue = "No active plan";
-      total = "N/A";
-    }
-    return Container(
-      width: 347.h,
-      margin: EdgeInsets.symmetric(horizontal: 1.h),
-      padding: EdgeInsets.symmetric(horizontal: 4.h, vertical: 6.v),
-      decoration: AppDecoration.outlineGray,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 2.h),
-            child: const Text(
-              "Your Membership",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+  Widget _buildSubscriptionStatus() {
+    return FutureBuilder<SubscriptionStatus>(
+      future: _subscriptionStatusFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildShimmerBox();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final status = snapshot.data!;
+          return Container(
+            width: 347.h,
+            margin: EdgeInsets.symmetric(horizontal: 1.h),
+            padding: EdgeInsets.symmetric(horizontal: 4.h, vertical: 6.v),
+            decoration: AppDecoration.outlineGray,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 2.h),
+                  child: const Text(
+                    "Your Membership",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(height: 8.v),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildColumnWithLabelAndData(
+                        "Current Plan", status.currentPlan),
+                    _buildColumnWithLabelAndData(
+                        status.dateLabel, status.dateValue),
+                    _buildColumnWithLabelAndData("Total", status.total),
+                  ],
+                ),
+                SizedBox(height: 20.v),
+                if (status.dateLabel == "Next billing date")
+                  _buildActionButton("Cancel Subscription", _cancelSubscription)
+              ],
             ),
-          ),
-          SizedBox(height: 8.v),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildColumnWithLabelAndData("Current Plan", currentPlan),
-              _buildColumnWithLabelAndData(dateLabel, dateValue),
-              _buildColumnWithLabelAndData("Total", total),
-            ],
-          ),
-          SizedBox(height: 20.v),
-          if (_upcomingInvoice != null)
-            _buildActionButton("Cancel Subscription", _cancelSubscription),
-          if (_upcomingInvoice == null && _expiredInvoice == null)
-            _buildActionButton("Subscribe Now", _navigateToSubscriptionScreen),
-        ],
-      ),
+          );
+        } else {
+          return const Text('No data available');
+        }
+      },
     );
   }
 
@@ -216,18 +228,18 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
   }
 
   Widget _buildShimmerBox() {
-    return Container(
-      width: 347.h,
-      height: 100.h,
-      padding: EdgeInsets.all(16.h),
-      decoration: AppDecoration.outlineGray,
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: 347.h,
+        height: 100.h,
+        padding: EdgeInsets.all(16.h),
+        decoration: AppDecoration.outlineGray,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(
-            5,
+            3,
             (_) => Padding(
               padding: EdgeInsets.symmetric(vertical: 4.h),
               child: Container(
@@ -286,13 +298,24 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
             .credentials!
             .accessToken);
 
-    try {
-      _expiredInvoice = await billingService.cancelSubscription();
-      setState(() {});
-    } catch (e) {}
-  }
+    await billingService.cancelSubscription();
 
-  void _navigateToSubscriptionScreen() {
-    Navigator.pushNamed(context, AppRoutes.subscriptionScreen);
+    setState(() {
+      _subscriptionStatusFuture = _fetchSubscriptionStatus();
+    });
   }
+}
+
+class SubscriptionStatus {
+  final String currentPlan;
+  final String dateLabel;
+  final String dateValue;
+  final String total;
+
+  SubscriptionStatus({
+    required this.currentPlan,
+    required this.dateLabel,
+    required this.dateValue,
+    required this.total,
+  });
 }
