@@ -41,7 +41,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
           children: [
             Stack(
               children: [
-                _buildCardSection(context, widget.restaurantDetail),
+                _buildImage(context, widget.restaurantDetail),
                 Positioned(
                   top: 16.0,
                   left: 16.0,
@@ -60,7 +60,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildFiveSection(context, widget.restaurantDetail),
+                  _buildDetailBody(context, widget.restaurantDetail),
                   SizedBox(height: 25.v),
                   Container(
                     width: 295.h,
@@ -85,7 +85,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                     ),
                   ),
                   SizedBox(height: 25.v),
-                  _buildOneSection(context, widget.restaurantDetail),
+                  _buildMap(context, widget.restaurantDetail),
                 ],
               ),
             ),
@@ -95,7 +95,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     );
   }
 
-  Widget _buildCardSection(BuildContext context, RestaurantDetail restaurant) {
+  Widget _buildImage(BuildContext context, RestaurantDetail restaurant) {
     return Padding(
       // ignore: prefer_const_constructors
       padding: EdgeInsets.only(top: 20.0),
@@ -116,7 +116,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     );
   }
 
-  Widget _buildFiveSection(BuildContext context, RestaurantDetail restaurant) {
+  Widget _buildDetailBody(BuildContext context, RestaurantDetail restaurant) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 30.h),
       child: Row(
@@ -184,7 +184,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     );
   }
 
-  Widget _buildOneSection(BuildContext context, RestaurantDetail restaurant) {
+  Widget _buildMap(BuildContext context, RestaurantDetail restaurant) {
     String staticMapUrl = generateStaticMapUrl(restaurant.address);
 
     return GestureDetector(

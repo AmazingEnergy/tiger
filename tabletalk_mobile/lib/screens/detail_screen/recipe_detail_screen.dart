@@ -255,7 +255,6 @@ class RecipeDetailScreenState extends State<RecipeDetailScreen>
     }
   }
 
-  /// Navigates back to the previous screen.
   onTapImgArrowLeft(BuildContext context) {
     Navigator.pop(context);
   }
